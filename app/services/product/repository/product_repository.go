@@ -1,11 +1,10 @@
 package repository
 
 import (
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
-
 	"fmt"
 
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 	"gorm.io/gorm"
 )
 
@@ -13,19 +12,22 @@ type ProductRepository struct {
 	DB *gorm.DB
 }
 
-// type FetchAllBody struct {
-// 	Preload       []string
-// 	Metadata      *paginationMetadata `json:"metadata"`
-// 	CategoryIDArr []int     `json:"category_id_arr"`
-// }
+type FetchAllReq struct {
+	Preload
+	Metadata     *pagination.Metadata `json:"metadata"`
+	ProductIDArr []int                `json:"product_id_arr"`
+}
 
-func (r *ProductRepository) FetchAll(m *pagination.Metadata) (*Pagination, error) {
-	preloadArr := Preload{"variants", "options", "sku_values", "prices"} // ! udpate
+func (r *ProductRepository) FetchAll(req *FetchAllReq) (*Pagination, error) {
 
 	res := &Pagination{Metadata: &pagination.Metadata{}}
 	products := []*model.Product{}
 	query := r.DB.Model(&model.Product{}).
 		Unscoped()
+	// if it has product_id_arr
+	if req.ProductIDArr != nil {
+		query = query.Where("products.id IN (?)", req.ProductIDArr)
+	}
 
 	var total int64
 	err := query.Count(&total).Error
@@ -33,13 +35,16 @@ func (r *ProductRepository) FetchAll(m *pagination.Metadata) (*Pagination, error
 		fmt.Printf("Error counting Total : %v", err)
 		return nil, err
 	}
+
 	// build metadata total
 	res.Metadata.UpdateTotal(total)
 
 	// query
 
-	res.paginate(m)
-	HandlePreload(query, &preloadArr)
+	res.paginate(req.Metadata)
+	if req.Preload != nil { // check wether slice is empty
+		HandlePreload(query, &req.Preload)
+	}
 
 	err = query.
 		Offset(res.Metadata.Offset).

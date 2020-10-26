@@ -1,4 +1,4 @@
-package httpHelper
+package httphelper
 
 type Response struct {
 	Status  int         `json:"status"`
@@ -9,5 +9,5 @@ type Response struct {
 const (
 	BadRequestMessage          = "bad_request"
 	InternalServerErrorMessage = "internal_server_error"
-	StatusOKMessage            = "success"
+	StatusOkMessage            = "success"
 )
