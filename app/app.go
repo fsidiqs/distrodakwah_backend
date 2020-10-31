@@ -22,11 +22,13 @@ func Run() {
 
 	e := router.Init()
 
-	port := 3001
+	fmt.Println("the port is:", os.Getenv("Port"))
 	env := os.Getenv("ENV")
+	// port, _ := strconv.Atoi(os.Getenv("PORT"))
+	port := 3001
 	if env == "STAGING" || env == "PRODUCTION" {
 		port, _ = strconv.Atoi(os.Getenv("PORT"))
 	}
-	fmt.Printf("App is running on port: %v", port)
+	fmt.Println("App is running on", port)
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", port)))
 }
