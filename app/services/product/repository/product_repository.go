@@ -25,11 +25,12 @@ func (r *ProductRepository) FetchAll(req *FetchAllReq) (*Pagination, error) {
 	query := r.DB.Model(&model.Product{}).
 		Unscoped()
 	// if it has product_id_arr
-	if req.ProductIDArr != nil {
+	if len(req.ProductIDArr) > 0 {
 		query = query.Where("products.id IN (?)", req.ProductIDArr)
 	}
 
 	var total int64
+
 	err := query.Count(&total).Error
 	if err != nil {
 		fmt.Printf("Error counting Total : %v", err)
@@ -62,6 +63,24 @@ func (r *ProductRepository) FetchAll(req *FetchAllReq) (*Pagination, error) {
 
 	return res, nil
 }
+
+func (r *ProductRepository) SaveProduct(product *model.SaveProduct) (*model.SaveProduct, error) {
+	tx := r.DB.Begin()
+	err := tx.Model(&model.SaveProduct{}).Create(product).Error
+
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return product, tx.Commit().Error
+}
+
+// func (r *ProductRepository) SaveProductImage(pI *model.ProductImage) (*model.ProductImage, error) {
+// tx := r.DB.Begin()
+
+// err := tx.Model(&model.Product)
+// }
 
 func (p *Pagination) paginate(m *pagination.Metadata) {
 

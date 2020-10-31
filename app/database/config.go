@@ -7,28 +7,31 @@ import (
 
 func BuildDSN() string {
 	var dsn string
+	var host, port, user, pass, dbname string
+
 	env := os.Getenv("ENV")
-	_ = env
-	host := os.Getenv("DB_HOST")
+	if env == "STAGING" {
+		host = os.Getenv("DB_HOST_STAGING")
+		port = os.Getenv("DB_PORT_STAGING")
+		user = os.Getenv("DB_USERNAME_STAGING")
+		pass = os.Getenv("DB_PASSWORD_STAGING")
+		dbname = os.Getenv("DB_NAME_STAGING")
+	}
 	if host == "" {
 		host = "127.0.0.1"
 	}
-	port := os.Getenv("DB_PORT")
 	if port == "" {
 		port = "3306"
 	}
 
-	user := os.Getenv("DB_USERNAME")
 	if user == "" {
 		user = "root"
 	}
 
-	pass := os.Getenv("DB_PASSWORD")
 	if pass == "" {
 		pass = "root"
 	}
 
-	dbname := os.Getenv("DB_NAME")
 	if dbname == "" {
 		dbname = "dd"
 	}

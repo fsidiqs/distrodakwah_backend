@@ -2,9 +2,9 @@ package api
 
 import (
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/controller"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/repository"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/controller"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
 )
 
 var (
@@ -19,4 +19,5 @@ func Init() {
 
 func ProductGroup(g *echo.Group) {
 	g.GET("", productController.Gets)
+	g.POST("", productController.Post)
 }

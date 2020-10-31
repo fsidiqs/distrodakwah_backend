@@ -1,25 +1,41 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type ProductStatus uint8
 
 // Product is base product table
 type Product struct {
 	gorm.Model
-	Name           string           `gorm:"type:varchar(255);not null" json:"name"`
-	ProductImageID uint             `gorm:"type:BIGINT" json:"product_image_id"`
-	Status         ProductStatus    `gorm:"char(1);default:0" json:"status"`
-	Variants       []*VariantOption `gorm:"foreignKey:ProductID" json:"variants,omitempty"`
-	SkuValues      []*SkuValuePrice `gorm:"foreignKey:ProductID" json:"sku_values"`
+	BrandID       uint                   `gorm:"type:INT;UNSIGNED;NOT NULL" json:"brand_id"`
+	CategoryID    uint                   `gorm:"type:INT;UNSIGNED;NOT NULL" json:"category_id"`
+	ProductTypeID uint8                  `gorm:"type:INT;UNSIGNED;NOT NULL" json:"product_type_id"`
+	ProductType   *ProductType           `gorm:"foreignKey:ProductTypeID;references:ID" json:"product_type,omitempty"`
+	Name          string                 `gorm:"type:varchar(255);not null" json:"name"`
+	Description   string                 `gorm:"type:text;not null" json:"description"`
+	Status        ProductStatus          `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
+	ProductImages []*ProductHasManyImage `gorm:"foreignKey:ProductID;references:ID" json:"product_images"`
+
+	SingleProduct  *SingleProduct    `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
+	VariantProduct []*VariantProduct `gorm:"foreignKey:ProductID;references:ID" json:"variant_product,omitempty"`
 }
 
-type ProductVariantOptionSkuValuePrice struct {
-	*Product
-	Variants  []*VariantOption `gorm:"foreignKey:ProductID" json:"variants"`
-	SkuValues []*SkuValuePrice `gorm:"foreignKey:ProductID" json:"sku_values"`
+type SaveProduct struct {
+	gorm.Model
+	BrandID       uint          `gorm:"type:INT;UNSIGNED;NOT NULL" json:"brand_id"`
+	CategoryID    uint          `gorm:"type:INT;UNSIGNED;NOT NULL" json:"category_id"`
+	ProductTypeID uint8         `gorm:"type:INT;UNSIGNED;NOT NULL" json:"product_type_id"`
+	Name          string        `gorm:"type:varchar(255);not null" json:"name"`
+	Description   string        `gorm:"type:text;not null" json:"description"`
+	Status        ProductStatus `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
+	// ProductImages []*ProductHasManyImage `gorm:"foreignKey:ProductID;references:ID" json:"product_images"`
+
+	// SingleProduct  *SingleProduct    `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
+	// VariantProduct []*VariantProduct `gorm:"foreignKey:ProductID;references:ID" json:"variant_product,omitempty"`
 }
 
-func (ProductVariantOptionSkuValuePrice) TableName() string {
+func (SaveProduct) TableName() string {
 	return "products"
 }

@@ -1,11 +1,14 @@
 -- +migrate Up
-CREATE TABLE IF NOT EXISTS brands(
-    `id` int UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+CREATE TABLE IF NOT EXISTS `brands` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
     `image_id` BIGINT UNSIGNED DEFAULT NULL,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    `deleted_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
     CONSTRAINT brands_image_id foreign key(image_id) references images(id)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
-
+) ENGINE = InnoDB;
 
 -- +migrate Down
-DROP TABLE brands;
+DROP TABLE `brands`;

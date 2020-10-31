@@ -1,0 +1,356 @@
+{
+  "elements": [
+    {
+      "ID": 1,
+      "CreatedAt": "0001-01-01T00:00:00Z",
+      "UpdatedAt": "0001-01-01T00:00:00Z",
+      "DeletedAt": "0001-01-01T00:00:00Z",
+      "brand_id": 2,
+      "category_id": 2,
+      "product_type_id": 1,"[\"https://files-distrodakwah.sgp1.digitaloceanspaces.com/JPA_Parka_Cream1.jpg\"]"
+      "product_type": {
+        "ID": 1,
+        "name": "single_product"
+      },
+      "name": "Azzuymar kaos dakwah single product",
+      "description": "Azzuymar kaos dakwah single product",
+      "status": 0,
+      "product_images": [
+        {
+          "product_id": 1,
+          "product_image_id": 2,
+          "product_image": {
+            "ID": 2,
+            "url": "https://files-distrodakwah.sgp1.digitaloceanspaces.com/Andalusia.jpg"
+          }
+        },
+        {
+          "product_id": 1,
+          "product_image_id": 1,
+          "product_image": {
+            "ID": 1,
+            "url": "https://files-distrodakwah.sgp1.digitaloceanspaces.com/JPA_Parka_Cream1.jpg"
+          }
+        },
+        {
+          "product_id": 1,
+          "product_image_id": 1,
+          "product_image": {
+            "ID": 1,
+            "url": "https://files-distrodakwah.sgp1.digitaloceanspaces.com/JPA_Parka_Cream1.jpg"
+          }
+        }
+      ],
+      "single_product": {
+        "ID": 1,
+        "product_id": 1,
+        "article": "AZS1",
+        "prices": [
+          {
+            "single_product_id": 1,
+            "price_id": 1,
+            "prices": {
+              "id": 1,
+              "name": "harga jual",
+              "value": 200000
+            }
+          },
+          {
+            "single_product_id": 1,
+            "price_id": 7,
+            "prices": {
+              "id": 7,
+              "name": "Harga Lain",
+              "value": 219038
+            }
+          },
+          {
+            "single_product_id": 1,
+            "price_id": 5,
+            "prices": {
+              "id": 5,
+              "name": "Harga Reseller",
+              "value": 4300000
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ID": 2,
+      "CreatedAt": "0001-01-01T00:00:00Z",
+      "UpdatedAt": "0001-01-01T00:00:00Z",
+      "DeletedAt": "0001-01-01T00:00:00Z",
+      "brand_id": 2,
+      "category_id": 2,
+      "product_type_id": 2,
+      "product_type": {
+        "ID": 2,
+        "name": "variant_product"
+      },
+      "name": "Azzuymar kaos dakwah variant_product",
+      "description": "",
+      "status": 0,
+      "product_images": [
+        {
+          "product_id": 2,
+          "product_image_id": 2,
+          "product_image": {
+            "ID": 2,
+            "url": "https://files-distrodakwah.sgp1.digitaloceanspaces.com/Andalusia.jpg"
+          }
+        },
+        {
+          "product_id": 2,
+          "product_image_id": 5,
+          "product_image": {
+            "ID": 5,
+            "url": "https://files-distrodakwah.sgp1.digitaloceanspaces.com/KC1.jpg"
+          }
+        },
+        {
+          "product_id": 2,
+          "product_image_id": 11,
+          "product_image": {
+            "ID": 11,
+            "url": "https://files.distrodakwah.id/yaumee/YM63f.jpg"
+          }
+        },
+        {
+          "product_id": 2,
+          "product_image_id": 12,
+          "product_image": {
+            "ID": 12,
+            "url": "https://files.distrodakwah.id/yaumee/am250.jpg"
+          }
+        },
+        {
+          "product_id": 2,
+          "product_image_id": 10,
+          "product_image": {
+            "ID": 10,
+            "url": "https://files.distrodakwah.id/yaumee/YM63e.jpg"
+          }
+        }
+      ],
+      "variant_product": [
+        {
+          "ID": 1,
+          "product_id": 2,
+          "article": "azmerahxl",
+          "variants": [],
+          "prices": [
+            {
+              "variant_product_id": 1,
+              "price_id": 11,
+              "prices": {
+                "id": 11,
+                "name": "Harga Lain",
+                "value": 109238190.22
+              }
+            },
+            {
+              "variant_product_id": 1,
+              "price_id": 2,
+              "prices": {
+                "id": 2,
+                "name": "harga jual",
+                "value": 300000
+              }
+            },
+            {
+              "variant_product_id": 1,
+              "price_id": 5,
+              "prices": {
+                "id": 5,
+                "name": "Harga Reseller",
+                "value": 4300000
+              }
+            }
+          ]
+        },
+        {
+          "ID": 2,
+          "product_id": 2,
+          "article": "azzmerahm",
+          "variants": [
+            {
+              "ID": 1,
+              "product_id": 2,
+              "name": "Warna",
+              "options": [
+                {
+                  "ID": 4,
+                  "variant_id": 1,
+                  "variant_product_id": 1,
+                  "name": "merah"
+                }
+              ]
+            },
+            {
+              "ID": 3,
+              "product_id": 2,
+              "name": "Ukuran",
+              "options": [
+                {
+                  "ID": 1,
+                  "variant_id": 3,
+                  "variant_product_id": 1,
+                  "name": "xl"
+                }
+              ]
+            }
+          ],
+          "prices": []
+        },
+        {
+          "ID": 3,
+          "product_id": 2,
+          "article": "azzmerahl",
+          "variants": [],
+          "prices": []
+        }
+      ]
+    },
+    {
+      "ID": 3,
+      "CreatedAt": "0001-01-01T00:00:00Z",
+      "UpdatedAt": "0001-01-01T00:00:00Z",
+      "DeletedAt": "0001-01-01T00:00:00Z",
+      "brand_id": 1,
+      "category_id": 1,
+      "product_type_id": 1,
+      "product_type": {
+        "ID": 1,
+        "name": "single_product"
+      },
+      "name": "Mofast Kurta dan Koko Single Product",
+      "description": "Mofast Kurta dan Koko Single Product",
+      "status": 0,
+      "product_images": [],
+      "single_product": {
+        "ID": 2,
+        "product_id": 3,
+        "article": "MOFS3",
+        "prices": []
+      }
+    },
+    {
+      "ID": 4,
+      "CreatedAt": "0001-01-01T00:00:00Z",
+      "UpdatedAt": "0001-01-01T00:00:00Z",
+      "DeletedAt": "0001-01-01T00:00:00Z",
+      "brand_id": 1,
+      "category_id": 2,
+      "product_type_id": 2,
+      "product_type": {
+        "ID": 2,
+        "name": "variant_product"
+      },
+      "name": "Mofast Kurta dan Koko Variant Product",
+      "description": "",
+      "status": 0,
+      "product_images": [
+        {
+          "product_id": 4,
+          "product_image_id": 6,
+          "product_image": {
+            "ID": 6,
+            "url": "https://files.distrodakwah.id/vendors/L-.jpg"
+          }
+        },
+        {
+          "product_id": 4,
+          "product_image_id": 8,
+          "product_image": {
+            "ID": 8,
+            "url": "https://files.distrodakwah.id/yaumee/YM63c.jpg"
+          }
+        }
+      ],
+      "variant_product": [
+        {
+          "ID": 4,
+          "product_id": 4,
+          "article": "mofbirul",
+          "variants": [
+            {
+              "ID": 2,
+              "product_id": 4,
+              "name": "Warna",
+              "options": [
+                {
+                  "ID": 5,
+                  "variant_id": 2,
+                  "variant_product_id": 7,
+                  "name": "abu"
+                },
+                {
+                  "ID": 6,
+                  "variant_id": 2,
+                  "variant_product_id": 9,
+                  "name": "abu"
+                }
+              ]
+            },
+            {
+              "ID": 4,
+              "product_id": 4,
+              "name": "Ukuran",
+              "options": [
+                {
+                  "ID": 2,
+                  "variant_id": 4,
+                  "variant_product_id": 7,
+                  "name": "l"
+                },
+                {
+                  "ID": 3,
+                  "variant_id": 4,
+                  "variant_product_id": 9,
+                  "name": "m"
+                }
+              ]
+            }
+          ],
+          "prices": []
+        },
+        {
+          "ID": 5,
+          "product_id": 4,
+          "article": "mofbirxl",
+          "variants": [],
+          "prices": []
+        },
+        {
+          "ID": 6,
+          "product_id": 4,
+          "article": "mofhitamxl",
+          "variants": [],
+          "prices": []
+        },
+        {
+          "ID": 7,
+          "product_id": 4,
+          "article": "mofabul",
+          "variants": [],
+          "prices": []
+        },
+        {
+          "ID": 8,
+          "product_id": 4,
+          "article": "mofabul",
+          "variants": [],
+          "prices": []
+        },
+        {
+          "ID": 9,
+          "product_id": 4,
+          "article": "mofabum",
+          "variants": [],
+          "prices": []
+        }
+      ]
+    }
+  ]
+}

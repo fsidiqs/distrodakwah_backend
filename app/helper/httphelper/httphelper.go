@@ -9,5 +9,5 @@ type Response struct {
 const (
 	BadRequestMessage          = "bad_request"
 	InternalServerErrorMessage = "internal_server_error"
-	StatusOkMessage            = "success"
+	StatusOKMessage            = "success"
 )
