@@ -54,23 +54,54 @@ func (pc *ProductController) Gets(c echo.Context) error {
 }
 
 func (pc *ProductController) Post(c echo.Context) error {
-	// create product image
-	fmt.Println("testing")
-	m := echo.Map{}
-	if err := c.Bind(&m); err != nil {
-		fmt.Printf("error: %+v", err)
+
+	product := &model.ProductFromRequestJSON{}
+	// var product map[string]interface{}
+	if err := c.Bind(&product); err != nil {
+		fmt.Printf("error: %+v ", err)
 		return err
 	}
-	fmt.Printf("%+v \n", m)
-	product := &model.SaveProduct{}
 
-	err := c.Bind(&product)
-	fmt.Printf("%+v \n", product)
+	// for _, prices := range product.ProductDetail.Prices {
+	// 	fmt.Printf("%+v \n", *prices)
 
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, httphelper.BadRequestMessage)
+	// }
+	// fmt.Printf("%+v \n", product)
+	// fmt.Printf("%+v \n", product.ProductDetail.Pri)
+	// req, err := ioutil.ReadAll(c.Request().Body)
+
+	// err = json.Unmarshal(req, &product)
+	// if err != nil {
+	// 	fmt.Printf("error parsing %+v \n", err)
+	// 	return nil
+	// }
+	// fmt.Printf("%+v \n", product)
+	// for _, image := range product.ProductDetail {
+	// 	fmt.Printf("%+v \n", *image)
+	// }
+	// fmt.Printf("%T \n", *product.ProductImages[0])
+	// json.Unmarshal(&produ)
+	// fmt.Printf("%+v \n", product)
+
+	// if err != nil {
+	// 	return c.JSON(http.StatusBadRequest, httphelper.BadRequestMessage)
+	// }
+
+	// product, err = pc.ProductRepository.SaveProduct(product)
+	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
+}
+
+func (pc *ProductController) CreateProductBasicStructure(c echo.Context) error {
+	product := &model.ProductFromRequestJSON{}
+	if err := c.Bind(&product); err != nil {
+		fmt.Printf("Error: %+v", err)
 	}
 
-	product, err = pc.ProductRepository.SaveProduct(product)
+	err := pc.ProductRepository.SaveProductBasicStructure(product)
+	if err != nil {
+		fmt.Printf("error creating product: %+v", err)
+		return c.JSON(http.StatusInternalServerError, httphelper.InternalServerErrorMessage)
+	}
+
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }

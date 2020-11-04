@@ -3,6 +3,7 @@ module github.com/zakiyfadhilmuhsin/distrodakwah_backend
 go 1.15
 
 require (
+	github.com/360EntSecGroup-Skylar/excelize v1.4.1 // indirect
 	github.com/Bowery/prompt v0.0.0-20190916142128-fa8279994f75 // indirect
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect

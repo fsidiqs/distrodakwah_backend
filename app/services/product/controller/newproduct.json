@@ -7,7 +7,7 @@
       "DeletedAt": "0001-01-01T00:00:00Z",
       "brand_id": 2,
       "category_id": 2,
-      "product_type_id": 1,"[\"https://files-distrodakwah.sgp1.digitaloceanspaces.com/JPA_Parka_Cream1.jpg\"]"
+      "product_type_id": 1,
       "product_type": {
         "ID": 1,
         "name": "single_product"
@@ -44,7 +44,7 @@
       "single_product": {
         "ID": 1,
         "product_id": 1,
-        "article": "AZS1",
+        "sku": "AZS1",
         "prices": [
           {
             "single_product_id": 1,
@@ -137,7 +137,7 @@
         {
           "ID": 1,
           "product_id": 2,
-          "article": "azmerahxl",
+          "sku": "azmerahxl",
           "variants": [],
           "prices": [
             {
@@ -172,7 +172,7 @@
         {
           "ID": 2,
           "product_id": 2,
-          "article": "azzmerahm",
+          "sku": "azzmerahm",
           "variants": [
             {
               "ID": 1,
@@ -206,7 +206,7 @@
         {
           "ID": 3,
           "product_id": 2,
-          "article": "azzmerahl",
+          "sku": "azzmerahl",
           "variants": [],
           "prices": []
         }
@@ -231,7 +231,7 @@
       "single_product": {
         "ID": 2,
         "product_id": 3,
-        "article": "MOFS3",
+        "sku": "MOFS3",
         "prices": []
       }
     },
@@ -272,7 +272,7 @@
         {
           "ID": 4,
           "product_id": 4,
-          "article": "mofbirul",
+          "sku": "mofbirul",
           "variants": [
             {
               "ID": 2,
@@ -318,35 +318,35 @@
         {
           "ID": 5,
           "product_id": 4,
-          "article": "mofbirxl",
+          "sku": "mofbirxl",
           "variants": [],
           "prices": []
         },
         {
           "ID": 6,
           "product_id": 4,
-          "article": "mofhitamxl",
+          "sku": "mofhitamxl",
           "variants": [],
           "prices": []
         },
         {
           "ID": 7,
           "product_id": 4,
-          "article": "mofabul",
+          "sku": "mofabul",
           "variants": [],
           "prices": []
         },
         {
           "ID": 8,
           "product_id": 4,
-          "article": "mofabul",
+          "sku": "mofabul",
           "variants": [],
           "prices": []
         },
         {
           "ID": 9,
           "product_id": 4,
-          "article": "mofabum",
+          "sku": "mofabum",
           "variants": [],
           "prices": []
         }

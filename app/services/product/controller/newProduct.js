@@ -1,5 +1,5 @@
 const productDetail = {
-    article: "AZZInput",
+    sku: "AZZInput",
     prices: [
         {
             prices: {
@@ -27,7 +27,7 @@ const productDetail = {
 
 const variantProductDetail = [
     {
-        article: "AZZInputVariantMerahXL",
+        sku: "AZZInputVariantMerahXL",
         prices: [
             {
                 name:"Harga Jual",
@@ -36,7 +36,7 @@ const variantProductDetail = [
             {
                 name:"Harga Reseller",
                 value: 291892.22,
-            }
+            },
             {
                 name: "Harga Lain",
                 value: 444929.19,
@@ -47,7 +47,7 @@ const variantProductDetail = [
     {
         "ID": 2,
         "product_id": 2,
-        "article": "azzmerahm",
+        "sku": "azzmerahm",
         "variants": [
           {
             "ID": 1,

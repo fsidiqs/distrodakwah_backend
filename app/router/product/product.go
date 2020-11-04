@@ -20,4 +20,5 @@ func Init() {
 func ProductGroup(g *echo.Group) {
 	g.GET("", productController.Gets)
 	g.POST("", productController.Post)
+	g.POST("/create-product-basic-structure", productController.CreateProductBasicStructure)
 }
