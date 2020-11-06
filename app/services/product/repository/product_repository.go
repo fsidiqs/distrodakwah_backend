@@ -126,11 +126,11 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.Prod
 
 	//  STEP create product prices
 
-	// if productReqJSON.ProductCharacterID == 1 {
+	// if productReqJSON.ProductKindID == 1 {
 
 	// 	err = json.NewDecoder(strings.NewReader(productReqJSON.SingleProductDetail)).Decode(&productImagesReq)
 	// 	err = productReqJSON.ProductDetail.SingleProductHargaJual.Validate()
-	// } else if productReqJSON.ProductCharacterID == 2 {
+	// } else if productReqJSON.ProductKindID == 2 {
 
 	// }
 	if err != nil {
@@ -140,32 +140,22 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.Prod
 
 	// STEP Create Product and prepare returned result
 	productRes := &model.Product{
-		BrandID:            productReqJSON.BrandID,
-		CategoryID:         productReqJSON.CategoryID,
-		ProductTypeID:      productReqJSON.ProductTypeID,
-		ProductCharacterID: productReqJSON.ProductCharacterID,
-		Status:             productReqJSON.Status,
-		Name:               productReqJSON.Name,
-		Description:        productReqJSON.Description,
+		BrandID:       productReqJSON.BrandID,
+		CategoryID:    productReqJSON.CategoryID,
+		ProductTypeID: productReqJSON.ProductTypeID,
+		ProductKindID: productReqJSON.ProductKindID,
+		Status:        productReqJSON.Status,
+		Name:          productReqJSON.Name,
+		Description:   productReqJSON.Description,
+		Sku:           productReqJSON.Sku,
 	}
 
 	err = tx.Model(&model.Product{}).Create(&productRes).Error
 
 	if err != nil {
-		fmt.Printf("error creating product\n %+v \n", err)
+		fmt.Printf("error creating product \n %+v \n", err)
 		tx.Rollback()
 		return nil
-	}
-	//STEP Create ProductSku
-	err = tx.Model(&model.ProductSku{}).Create(
-		&model.ProductSku{
-			ProductID: productRes.ID,
-			Sku:       productReqJSON.MainSku,
-		}).Error
-	if err != nil {
-		fmt.Printf("error creating ProductSku\n %+v \n", err)
-		tx.Rollback()
-		return err
 	}
 
 	//  Create ProductsProductImages
@@ -195,25 +185,31 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.Prod
 	}
 
 	// 4.a create singleProduct
-	if productReqJSON.ProductCharacterID == 1 {
+	if productReqJSON.ProductKindID == 1 {
 
 		SingleProductDetailReq := &request.SingleProductDetailReq{}
 		err = json.NewDecoder(strings.NewReader(productReqJSON.SingleProductDetail)).Decode(&SingleProductDetailReq)
-		fmt.Printf("singleproducthargajual: %+v\n", SingleProductDetailReq)
-		prices := []*model.Price{
-			{Name: request.HargaJualName, Value: SingleProductDetailReq.Price},
+		// STEP ofCreating single product
+		singleProduct := &model.SingleProduct{
+			ProductID: productRes.ID,
+			Weight:    SingleProductDetailReq.Weight,
 		}
 
-		err = tx.Model(&model.Price{}).Create(&prices).Error
+		err = tx.Model(&model.SingleProduct{}).Create(&singleProduct).Error
+
 		if err != nil {
-			fmt.Printf("error creating prices \n %+v \n", err)
+			fmt.Printf("Error Creating Single Product \n %+v \n", err)
 			tx.Rollback()
 			return err
 		}
+
+		// STEP Of creating singleProductPriceArr
+
 		singleProductPriceArr := []*model.SingleProductsPrices{
 			{
-				ProductID: productRes.ID,
-				PriceID:   prices[0].ID, // harga jual
+				SingleProductID: singleProduct.ID,
+				Name:            request.HargaJualName,
+				Value:           SingleProductDetailReq.Price,
 			},
 		}
 		err = tx.Model(&model.SingleProductsPrices{}).Create(&singleProductPriceArr).Error
@@ -223,33 +219,40 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.Prod
 			return err
 		}
 
-	} else if productReqJSON.ProductCharacterID == 2 {
+	} else if productReqJSON.ProductKindID == 2 {
 		variantProductDetailReqs := []*request.VariantProductDetailReq{}
 		err = json.NewDecoder(strings.NewReader(productReqJSON.VariantProductDetail)).Decode(&variantProductDetailReqs)
 		//STEP VariantProduct Create
 
 		for _, variantProductDetailReq := range variantProductDetailReqs {
-			fmt.Println("start")
 			// Creating VariantProduct
 			var variantProduct *model.VariantProduct
 			variantProduct = &model.VariantProduct{
 				ProductID: productRes.ID,
 				Sku:       variantProductDetailReq.Sku,
+				Weight:    variantProductDetailReq.Weight,
 			}
+
 			err = tx.Model(&model.VariantProduct{}).Create(&variantProduct).Error
-			// Creating Price
-			price := &model.Price{
-				Name: request.HargaJualName, Value: variantProductDetailReq.SellingPrice,
+			if err != nil {
+				fmt.Printf("Error Creating VariantProduct \n %+v \n", err)
+				tx.Rollback()
+				return err
 			}
-			err = tx.Model(&model.Price{}).Create(&price).Error
 
 			//STEP variant_products_prices
 			variantProductPrice := &model.VariantProductsPrices{
 				VariantProductID: variantProduct.ID,
-				PriceID:          price.ID,
+				Name:             request.HargaJualName,
+				Value:            variantProductDetailReq.SellingPrice,
 			}
 
 			err = tx.Model(&model.VariantProductsPrices{}).Create(&variantProductPrice).Error
+			if err != nil {
+				fmt.Printf("Error Creating VariantProductsPrices \n %+v \n", err)
+				tx.Rollback()
+				return err
+			}
 
 			//STEP Variants Create
 			for _, variantReq := range variantProductDetailReq.Variants {
@@ -257,8 +260,12 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.Prod
 					ProductID: productRes.ID,
 					Name:      variantReq.VariantValue,
 				}
-				fmt.Printf("variantProdut: %+v\n", *variantProduct)
 				err = tx.Model(&model.Variant{}).Create(&variant).Error
+				if err != nil {
+					fmt.Printf("Error Creating Variant \n %+v \n", err)
+					tx.Rollback()
+					return err
+				}
 
 				option := &model.Option{
 					VariantID:        variant.ID,
@@ -266,7 +273,11 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.Prod
 					VariantProductID: variantProduct.ID,
 				}
 				err = tx.Model(&model.Option{}).Create(&option).Error
-				fmt.Printf("option: %+v\n", *option)
+				if err != nil {
+					fmt.Printf("Error Creating Option \n %+v \n", err)
+					tx.Rollback()
+					return err
+				}
 
 			}
 

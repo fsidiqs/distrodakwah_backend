@@ -21,4 +21,17 @@ func ProductGroup(g *echo.Group) {
 	g.GET("", productController.Gets)
 	g.POST("", productController.Post)
 	g.POST("/create-product-basic-structure", productController.CreateProductBasicStructure)
+
+	g.GET("/generate-price-template", productController.GeneratePriceTemplate)
+	g.POST("/import-prices", productController.ImportPrices)
+
+	g.GET("/brands", productController.GetBrands)
+	g.GET("/departments", productController.GetDepartments)
+	g.GET("/subdepartments", productController.GetSubdepartments)
+	g.GET("/categories", productController.GetCategories)
+
+	g.POST("/brands", productController.PostBrand)
+	g.POST("/departments", productController.PostDepartment)
+	g.POST("/subdepartments", productController.PostSubdepartment)
+	g.POST("/categories", productController.PostCategory)
 }

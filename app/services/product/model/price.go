@@ -1,7 +1,15 @@
 package model
 
-type Price struct {
-	ID    uint64  `gorm:"primaryKey;autoIncrement;not null" json:"id"`
-	Name  string  `gorm:"type:varchar(255);not null" json:"name"`
-	Value float64 `gorm:"type:decimal(19,2);not null;default:0.0" json:"value"`
+type SingleProductPriceTemplate struct {
+	SingleProductID uint64  `json:"single_product_id"`
+	Sku             string  `json:"sku"`
+	PriceName       string  `json:"nama_harga"`
+	PriceValue      float64 `json:"nilai_harga"`
+}
+
+type VariantProductPriceTemplate struct {
+	VariantProductID uint64  `json:"variant_product_id"`
+	Sku              string  `json:"sku"`
+	PriceName        string  `json:"nama_harga"`
+	PriceValue       float64 `json:"nilai_harga"`
 }

@@ -11,40 +11,41 @@ type ProductStatus uint8
 
 // Product is base product table
 type Product struct {
-	ID                 uint64                  `gorm:"primaryKey;autoIncrement;not null"`
-	CreatedAt          time.Time               `json:"created_at"`
-	UpdatedAt          time.Time               `json:"updated_at"`
-	DeletedAt          gorm.DeletedAt          `gorm:"index" json:"deleted_at"`
-	BrandID            uint                    `json:"brand_id"`
-	CategoryID         uint                    `json:"category_id"`
-	ProductTypeID      uint8                   `gorm:"type:INT;UNSIGNED;NOT NULL" json:"product_type_id"`
-	ProductCharacterID uint8                   `gorm:"type:TINYINT;UNSIGNED;NOT NULL" json:"product_character_id"`
-	Name               string                  `gorm:"type:varchar(255);not null" json:"name"`
-	Description        string                  `gorm:"type:text;not null" json:"description"`
-	Status             ProductStatus           `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
-	ProductImages      []*ProductsProductImage `gorm:"foreignKey:ProductID;references:ID" json:"product_images"`
-	ProductSku         *ProductSku             `gorm:"foreignKey:ProductID;references:ID" json:"product_sku"`
+	ID            uint64                  `gorm:"primaryKey;autoIncrement;not null"`
+	CreatedAt     time.Time               `json:"created_at"`
+	UpdatedAt     time.Time               `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt          `gorm:"index" json:"deleted_at"`
+	BrandID       uint                    `json:"brand_id"`
+	CategoryID    uint                    `json:"category_id"`
+	ProductTypeID uint8                   `gorm:"type:INT;UNSIGNED;NOT NULL" json:"product_type_id"`
+	ProductKindID uint8                   `gorm:"type:TINYINT;UNSIGNED;NOT NULL" json:"product_kind_id"`
+	Name          string                  `gorm:"type:varchar(255);not null" json:"name"`
+	Description   string                  `gorm:"type:text;not null" json:"description"`
+	Status        ProductStatus           `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
+	ProductImages []*ProductsProductImage `gorm:"foreignKey:ProductID;references:ID" json:"product_images"`
+	Sku           string                  `gorm:"type:varchar(255);not null" json:"sku"`
 }
 
 type ProductResponse struct {
-	ID                   uint64                  `gorm:"primaryKey;autoIncrement;not null"`
-	CreatedAt            time.Time               `json:"created_at"`
-	UpdatedAt            time.Time               `json:"updated_at"`
-	DeletedAt            gorm.DeletedAt          `gorm:"index" json:"deleted_at"`
-	BrandID              uint                    `json:"brand_id"`
-	Brand                *Brand                  `gorm:"foreignKey:BrandID" json:"brand"`
-	CategoryID           uint                    `json:"category_id"`
-	Category             *Category               `gorm:"foreignKey:CategoryID" json:"category"`
-	ProductTypeID        uint8                   `gorm:"type:INT;UNSIGNED;NOT NULL" json:"product_type_id"`
-	ProductType          *ProductType            `gorm:"foreignKey:ProductTypeID;references:ID" json:"product_type,omitempty"`
-	ProductCharacterID   uint8                   `gorm:"type:TINYINT;UNSIGNED;NOT NULL" json:"product_character_id"`
-	ProductCharacter     *ProductCharacter       `gorm:"foreignKey:ProductCharacterID;references:ID" json:"product_character,omitempty"`
-	Name                 string                  `gorm:"type:varchar(255);not null" json:"name"`
-	Description          string                  `gorm:"type:text;not null" json:"description"`
-	Status               ProductStatus           `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
-	ProductImages        []*ProductsProductImage `gorm:"foreignKey:ProductID;references:ID" json:"product_images"`
-	ProductSku           *ProductSku             `gorm:"foreignKey:ProductID;references:ID" json:"product_sku"`
-	SingleProductsPrices []*SingleProductsPrices `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
+	ID            uint64                  `gorm:"primaryKey;autoIncrement;not null"`
+	CreatedAt     time.Time               `json:"created_at"`
+	UpdatedAt     time.Time               `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt          `gorm:"index" json:"deleted_at"`
+	BrandID       uint                    `json:"brand_id"`
+	Brand         *Brand                  `gorm:"foreignKey:BrandID" json:"brand,omitempty"`
+	CategoryID    uint                    `json:"category_id"`
+	Category      *Category               `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	ProductTypeID uint8                   `gorm:"type:INT;UNSIGNED;NOT NULL" json:"product_type_id"`
+	ProductType   *ProductType            `gorm:"foreignKey:ProductTypeID;references:ID" json:"product_type,omitempty"`
+	ProductKindID uint8                   `gorm:"type:TINYINT;UNSIGNED;NOT NULL" json:"product_kind_id"`
+	ProductKind   *ProductKind            `gorm:"foreignKey:ProductKindID;references:ID" json:"product_kind,omitempty"`
+	Name          string                  `gorm:"type:varchar(255);not null" json:"name"`
+	Description   string                  `gorm:"type:text;not null" json:"description"`
+	Status        ProductStatus           `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
+	ProductImages []*ProductsProductImage `gorm:"foreignKey:ProductID;references:ID" json:"product_images"`
+	Sku           string                  `gorm:"type:varchar(255);not null" json:"sku"`
+
+	SingleProduct *SingleProduct `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
 
 	VariantProduct []*VariantProductFetch `gorm:"foreignKey:ProductID;references:ID" json:"variant_product,omitempty"`
 	Variants       []*Variant             `gorm:"foreignKey:ProductID;references:ID" json:"variants,omitempty"`
@@ -59,26 +60,26 @@ type ProductFromRequestJSON struct {
 	BrandID              uint          `json:"brand_id"`
 	CategoryID           uint          `json:"category_id"`
 	ProductTypeID        uint8         `json:"product_type_id"`
-	ProductCharacterID   uint8         `json:"product_character_id"`
+	ProductKindID        uint8         `json:"product_kind_id"`
 	Name                 string        `json:"name"`
 	Description          string        `json:"description"`
 	Status               ProductStatus `json:"status"`
 	ProductImages        string        `json:"product_images"`
 	SingleProductDetail  string        `json:"single_product_detail,omitempty"`
 	VariantProductDetail string        `json:"variant_product_detail,omitempty"`
-	MainSku              string        `json:"main_sku"`
+	Sku                  string        `json:"sku"`
 }
 
 type ProductFromRequest struct {
 	BrandID                          uint          `json:"brand_id"`
 	CategoryID                       uint          `json:"category_id"`
 	ProductTypeID                    uint8         `json:"product_type_id"`
-	ProductCharacterID               uint8         `json:"product_character_id"`
+	ProductKindID                    uint8         `json:"product_kind_id"`
 	Name                             string        `json:"name"`
 	Description                      string        `json:"description"`
 	Status                           ProductStatus `json:"status"`
 	ProductImages                    ProductImages `json:"product_images"`
-	MainSku                          string        `json:"main_sku"`
+	Sku                              string        `json:"sku"`
 	*request.SingleProductDetailReq  `json:"single_product_detail,omitempty"`
 	*request.VariantProductDetailReq `json:"variant_product_detail,omitempty"`
 	// SingleProduct  *SingleProduct    `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`

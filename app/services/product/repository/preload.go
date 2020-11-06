@@ -11,17 +11,14 @@ func HandlePreload(query *gorm.DB, pre *Preload) {
 				Preload("Brand").
 				Preload("Category").
 				Preload("ProductType").
-				Preload("ProductCharacter")
+				Preload("ProductKind")
 		} else if value == "product_image" {
 			query = query.Preload("ProductImages.ProductImage")
 		} else if value == "product_detail" {
-			query = query.Preload("ProductSku").
-				Preload("SingleProductsPrices.Price").
-				Preload("VariantProduct.VariantProductsPrices.Price"). //VariantProduct
+			query = query.
+				Preload("SingleProduct.SingleProductsPrices").
+				Preload("VariantProduct.VariantProductsPrices"). //VariantProduct
 				Preload("Variants.Option")
-		} else if value == "price" {
-			query = query.Preload("SingleProduct").
-				Preload("VariantProduct.VariantProductsPrices.Price")
 		}
 	}
 }
