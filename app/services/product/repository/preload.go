@@ -1,10 +1,11 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
+	"gorm.io/gorm"
+)
 
-type Preload []string
-
-func HandlePreload(query *gorm.DB, pre *Preload) {
+func HandlePreload(query *gorm.DB, pre *request.Preload) {
 	for _, value := range *pre {
 		if value == "belongs_to" {
 			query = query.Preload("ProductType").
@@ -22,3 +23,7 @@ func HandlePreload(query *gorm.DB, pre *Preload) {
 		}
 	}
 }
+
+// func SelectByColumnName(query *gorm.DB, cols []string){
+// 	for _, value :=
+// }

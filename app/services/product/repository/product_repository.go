@@ -11,13 +11,55 @@ import (
 	"gorm.io/gorm"
 )
 
-type FetchAllReq struct {
-	Preload
-	Metadata     *pagination.Metadata `json:"metadata"`
-	ProductIDArr []int                `json:"product_id_arr"`
+func (r *ProductRepository) FetchByColumns(req *request.FetchByColumnReq) (*Pagination, error) {
+
+	res := &Pagination{Metadata: &pagination.Metadata{}}
+	products := []*model.ProductResponse{}
+	query := r.DB.Model(&model.ProductResponse{}).
+		Unscoped()
+	if len(req.PTypeIDs) > 0 {
+		query = query.Where("product_type_id in (?)", req.PTypeIDs)
+	}
+	if len(req.PKindIDs) > 0 {
+		query = query.Where("product_kind_id in (?)", req.PKindIDs)
+	}
+
+	var total int64
+
+	err := query.Count(&total).Error
+	if err != nil {
+		fmt.Printf("Error counting Total : %v", err)
+		return nil, err
+	}
+
+	// build metadata total
+	res.Metadata.UpdateTotal(total)
+
+	// query
+
+	res.paginate(req.Metadata)
+	if req.Preload != nil { // check whether slice is empty
+		HandlePreload(query, &req.Preload)
+	}
+
+	err = query.
+		Offset(res.Metadata.Offset).
+		Limit(res.Metadata.Limit).
+		Find(&products).Error
+
+	res.UpdateElements(products)
+
+	if err != nil {
+		fmt.Printf("Error fetching products\n")
+		return nil, err
+	}
+
+	// build result
+
+	return res, nil
 }
 
-func (r *ProductRepository) FetchAll(req *FetchAllReq) (*Pagination, error) {
+func (r *ProductRepository) FetchAll(req *request.FetchAllReq) (*Pagination, error) {
 
 	res := &Pagination{Metadata: &pagination.Metadata{}}
 	products := []*model.ProductResponse{}
@@ -64,6 +106,18 @@ func (r *ProductRepository) FetchAll(req *FetchAllReq) (*Pagination, error) {
 	return res, nil
 }
 
+func (p *Pagination) paginate(m *pagination.Metadata) {
+
+	page, limit, offset := pagination.BuildPagination(m)
+	p.Metadata = &pagination.Metadata{
+		Total:  p.Metadata.Total,
+		Limit:  limit,
+		Offset: offset,
+		Page:   page,
+		Pages:  pagination.BuildPages(p.Metadata.Total, limit),
+	}
+}
+
 func (r *ProductRepository) SaveProduct(product *model.Product) (*model.Product, error) {
 	// tx := r.DB.Begin()
 	// err := tx.Model(&model.ProductImage{}).Create(product).Error
@@ -89,18 +143,6 @@ func (r *ProductRepository) SaveProductTx(product *model.Product, tx *gorm.DB) e
 	// }
 
 	return nil
-}
-
-func (p *Pagination) paginate(m *pagination.Metadata) {
-
-	page, limit, offset := pagination.BuildPagination(m)
-	p.Metadata = &pagination.Metadata{
-		Total:  p.Metadata.Total,
-		Limit:  limit,
-		Offset: offset,
-		Page:   page,
-		Pages:  pagination.BuildPages(p.Metadata.Total, limit),
-	}
 }
 
 func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.ProductFromRequestJSON) error {

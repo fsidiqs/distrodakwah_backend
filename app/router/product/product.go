@@ -29,7 +29,8 @@ func ProductGroup(g *echo.Group) {
 	g.GET("/departments", productController.GetDepartments)
 	g.GET("/subdepartments", productController.GetSubdepartments)
 	g.GET("/categories", productController.GetCategories)
-
+	// bycolumname
+	g.GET("/get-products-by-columns", productController.GetProductsByColumn)
 	g.POST("/brands", productController.PostBrand)
 	g.POST("/departments", productController.PostDepartment)
 	g.POST("/subdepartments", productController.PostSubdepartment)

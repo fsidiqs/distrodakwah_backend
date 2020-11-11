@@ -17,10 +17,41 @@ import (
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model/aux"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
 )
 
 type ProductController struct {
 	ProductRepository *repository.ProductRepository
+}
+
+func (pc *ProductController) GetProductsByColumn(c echo.Context) error {
+	pageReq, err := strconv.Atoi(c.QueryParam("p_page"))
+	limitReq, err := strconv.Atoi(c.QueryParam("p_limit"))
+
+	urlVal := c.QueryParams()
+	request := &request.FetchByColumnReq{
+		PKindIDs: []int{},
+		PTypeIDs: []int{},
+		Metadata: &pagination.Metadata{
+			Page:  pageReq,
+			Limit: limitReq,
+		},
+	}
+
+	if err := request.Mydecode(urlVal); err != nil {
+		return c.JSON(http.StatusBadRequest, httphelper.BadRequestMessage)
+	}
+
+	data, err := pc.ProductRepository.FetchByColumns(request)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, httphelper.InternalServerErrorMessage)
+	}
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    data,
+	}
+	return c.JSON(res.Status, res)
 }
 
 func (pc *ProductController) Gets(c echo.Context) error {
@@ -29,7 +60,7 @@ func (pc *ProductController) Gets(c echo.Context) error {
 	preloadReq := c.QueryParam("preload")
 	productIDArrReq := c.QueryParam("product_id_arr")
 
-	request := &repository.FetchAllReq{
+	request := &request.FetchAllReq{
 		Preload:      []string{},
 		ProductIDArr: []int{},
 		Metadata: &pagination.Metadata{
