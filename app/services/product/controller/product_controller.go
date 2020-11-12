@@ -98,32 +98,6 @@ func (pc *ProductController) Post(c echo.Context) error {
 		return err
 	}
 
-	// for _, prices := range product.ProductDetail.Prices {
-	// 	fmt.Printf("%+v \n", *prices)
-
-	// }
-	// fmt.Printf("%+v \n", product)
-	// fmt.Printf("%+v \n", product.ProductDetail.Pri)
-	// req, err := ioutil.ReadAll(c.Request().Body)
-
-	// err = json.Unmarshal(req, &product)
-	// if err != nil {
-	// 	fmt.Printf("error parsing %+v \n", err)
-	// 	return nil
-	// }
-	// fmt.Printf("%+v \n", product)
-	// for _, image := range product.ProductDetail {
-	// 	fmt.Printf("%+v \n", *image)
-	// }
-	// fmt.Printf("%T \n", *product.ProductImages[0])
-	// json.Unmarshal(&produ)
-	// fmt.Printf("%+v \n", product)
-
-	// if err != nil {
-	// 	return c.JSON(http.StatusBadRequest, httphelper.BadRequestMessage)
-	// }
-
-	// product, err = pc.ProductRepository.SaveProduct(product)
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }
 
@@ -141,8 +115,6 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }
-
-type M map[string]interface{}
 
 func (pc *ProductController) ImportPrices(c echo.Context) error {
 	form, err := c.MultipartForm()
@@ -203,7 +175,6 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 
 		}
 	}
-	fmt.Println(pricesTemplate)
 
 	rows = xlsx.GetRows("Variant Product Prices")
 	if err != nil {

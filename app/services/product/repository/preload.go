@@ -10,13 +10,14 @@ func HandlePreload(query *gorm.DB, pre *request.Preload) {
 		if value == "belongs_to" {
 			query = query.Preload("ProductType").
 				Preload("Brand").
-				Preload("Category").
+				Preload("Category.Subdepartment.Department").
 				Preload("ProductType").
 				Preload("ProductKind")
 		} else if value == "product_image" {
 			query = query.Preload("ProductImages.ProductImage")
 		} else if value == "product_detail" {
 			query = query.
+				// Preload("Category.")
 				Preload("SingleProduct.SingleProductsPrices").
 				Preload("VariantProduct.VariantProductsPrices"). //VariantProduct
 				Preload("Variants.Option")
@@ -24,6 +25,9 @@ func HandlePreload(query *gorm.DB, pre *request.Preload) {
 	}
 }
 
+// func PreloadCategoryHandler(query *gorm.DB, pre *request.Preload) {
+
+// }
 // func SelectByColumnName(query *gorm.DB, cols []string){
 // 	for _, value :=
 // }

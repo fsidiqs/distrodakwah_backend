@@ -8,8 +8,12 @@ import (
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/router"
 	product "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/router/product"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/config"
 )
 
+func init() {
+	config.Load()
+}
 func Run() {
 	fmt.Println("Connecting to db")
 	err := database.Connect()

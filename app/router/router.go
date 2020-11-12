@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+
 	product "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/router/product"
 )
 
@@ -15,7 +16,10 @@ func Init() *echo.Echo {
 	}))
 
 	productGroup := e.Group("/products")
+	InitAuthRoute()
+	authGroup := e.Group("/auth")
 
 	product.ProductGroup(productGroup)
+	AuthGroup(authGroup)
 	return e
 }

@@ -35,4 +35,6 @@ func ProductGroup(g *echo.Group) {
 	g.POST("/departments", productController.PostDepartment)
 	g.POST("/subdepartments", productController.PostSubdepartment)
 	g.POST("/categories", productController.PostCategory)
+
+	// g.Group("/auth", appMid.CheckAuthMiddleware, appMid.AdminRoleMiddleware)
 }
