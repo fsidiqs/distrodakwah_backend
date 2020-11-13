@@ -268,3 +268,29 @@ func (pc *ProductController) GeneratePriceTemplate(c echo.Context) (err error) {
 	return c.Blob(http.StatusOK, echo.MIMEOctetStream, b.Bytes())
 
 }
+
+func (pc *ProductController) GetProductKinds(c echo.Context) error {
+	data, err := pc.ProductRepository.FetchAllKind()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    data,
+	}
+	return c.JSON(res.Status, res)
+}
+
+func (pc *ProductController) GetProductTypes(c echo.Context) error {
+	data, err := pc.ProductRepository.FetchAllType()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    data,
+	}
+	return c.JSON(res.Status, res)
+}
