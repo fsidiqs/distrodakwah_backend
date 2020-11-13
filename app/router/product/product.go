@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
+
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/controller"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
 )
@@ -17,6 +18,12 @@ func Init() {
 	productController = controller.ProductController{&productRepository}
 }
 
+func productAuthGroup(g *echo.Group) {
+	g.GET("", productController.Gets)
+	g.POST("", productController.Post)
+
+}
+
 func ProductGroup(g *echo.Group) {
 	g.GET("", productController.Gets)
 	g.POST("", productController.Post)
@@ -29,12 +36,12 @@ func ProductGroup(g *echo.Group) {
 	g.GET("/departments", productController.GetDepartments)
 	g.GET("/subdepartments", productController.GetSubdepartments)
 	g.GET("/categories", productController.GetCategories)
+	g.GET("/product_types", productController.GetProductTypes)
+	g.Get("/product_kinds", productController.GetProductKinds)
 	// bycolumname
 	g.GET("/get-products-by-columns", productController.GetProductsByColumn)
 	g.POST("/brands", productController.PostBrand)
 	g.POST("/departments", productController.PostDepartment)
 	g.POST("/subdepartments", productController.PostSubdepartment)
 	g.POST("/categories", productController.PostCategory)
-
-	// g.Group("/auth", appMid.CheckAuthMiddleware, appMid.AdminRoleMiddleware)
 }

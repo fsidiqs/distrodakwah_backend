@@ -5,13 +5,8 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
 )
-
-type CategoryController struct {
-	ProductRepository *repository.ProductRepository
-}
 
 func (pc *ProductController) GetCategories(c echo.Context) error {
 	data, err := pc.ProductRepository.FetchAllCategory()

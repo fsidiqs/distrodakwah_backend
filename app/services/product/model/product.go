@@ -64,10 +64,10 @@ type ProductFromRequestJSON struct {
 	Name                 string        `json:"name"`
 	Description          string        `json:"description"`
 	Status               ProductStatus `json:"status"`
-	ProductImages        string        `json:"product_images"`
-	SingleProductDetail  string        `json:"single_product_detail,omitempty"`
-	VariantProductDetail string        `json:"variant_product_detail,omitempty"`
-	Sku                  string        `json:"sku"`
+	ProductImages        ProductImages
+	SingleProductDetail  string `json:"single_product_detail,omitempty"`
+	VariantProductDetail string `json:"variant_product_detail,omitempty"`
+	Sku                  string `json:"sku"`
 }
 
 type ProductFromRequest struct {
@@ -82,8 +82,6 @@ type ProductFromRequest struct {
 	Sku                              string        `json:"sku"`
 	*request.SingleProductDetailReq  `json:"single_product_detail,omitempty"`
 	*request.VariantProductDetailReq `json:"variant_product_detail,omitempty"`
-	// SingleProduct  *SingleProduct    `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
-	// VariantProduct []*VariantProduct `gorm:"foreignKey:ProductID;references:ID" json:"variant_product,omitempty"`
 }
 
 // func (p *SaveProduct) UnmarshalJSON(data []byte) error {

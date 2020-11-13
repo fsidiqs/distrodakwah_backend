@@ -14,6 +14,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/digitalocean"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model/aux"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
@@ -27,15 +28,21 @@ type ProductController struct {
 func (pc *ProductController) GetProductsByColumn(c echo.Context) error {
 	pageReq, err := strconv.Atoi(c.QueryParam("p_page"))
 	limitReq, err := strconv.Atoi(c.QueryParam("p_limit"))
+	preloadReq := c.QueryParam("preload")
 
 	urlVal := c.QueryParams()
 	request := &request.FetchByColumnReq{
+		Preload:  []string{},
 		PKindIDs: []int{},
 		PTypeIDs: []int{},
 		Metadata: &pagination.Metadata{
 			Page:  pageReq,
 			Limit: limitReq,
 		},
+	}
+
+	if preloadReq != "" {
+		err = json.NewDecoder(strings.NewReader(preloadReq)).Decode(&request.Preload)
 	}
 
 	if err := request.Mydecode(urlVal); err != nil {
@@ -101,13 +108,55 @@ func (pc *ProductController) Post(c echo.Context) error {
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }
 
-func (pc *ProductController) CreateProductBasicStructure(c echo.Context) error {
+func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err error) {
+	formReq, _ := c.MultipartForm()
+	productReq := c.FormValue("product")
+	files := formReq.File["product_images"]
 	product := &model.ProductFromRequestJSON{}
-	if err := c.Bind(&product); err != nil {
-		fmt.Printf("Error: %+v", err)
+
+	theFiles := make([]multipart.File, len(files))
+
+	for i, file := range files {
+		// Source
+
+		src, err := file.Open()
+
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		// Destination
+		theFiles[i], err = file.Open()
+
+		if err != nil {
+			return err
+		}
+		defer (theFiles[i]).Close()
+
+	}
+	fmt.Printf("%+v \n", files)
+
+	if productReq != "" {
+		err = json.NewDecoder(strings.NewReader(productReq)).Decode(&product)
+	}
+	productImageURLs, err := digitalocean.UploadFiles(theFiles)
+	for _, imgUrl := range productImageURLs {
+		product.ProductImages = append(
+			product.ProductImages,
+			&model.ProductImage{
+				URL: imgUrl,
+			},
+		)
+	}
+	fmt.Println("images jar: ", *product.ProductImages[0])
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, httphelper.BadRequestMessage)
 	}
 
-	err := pc.ProductRepository.SaveProductBasicStructure(product)
+	err = pc.ProductRepository.SaveProductBasicStructure(product)
 	if err != nil {
 		fmt.Printf("error creating product: %+v", err)
 		return c.JSON(http.StatusInternalServerError, httphelper.InternalServerErrorMessage)
@@ -267,4 +316,30 @@ func (pc *ProductController) GeneratePriceTemplate(c echo.Context) (err error) {
 	res.WriteHeader(http.StatusOK)
 	return c.Blob(http.StatusOK, echo.MIMEOctetStream, b.Bytes())
 
+}
+
+func (pc *ProductController) GetProductKinds(c echo.Context) error {
+	data, err := pc.ProductRepository.FetchAllKind()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    data,
+	}
+	return c.JSON(res.Status, res)
+}
+
+func (pc *ProductController) GetProductTypes(c echo.Context) error {
+	data, err := pc.ProductRepository.FetchAllType()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    data,
+	}
+	return c.JSON(res.Status, res)
 }
