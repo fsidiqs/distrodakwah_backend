@@ -1,5 +1,7 @@
 package model
 
+import "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
+
 type SingleProduct struct {
 	ID                   uint64                  `gorm:"primaryKey;autoIncrement;not null"`
 	ProductID            uint64                  `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
@@ -15,5 +17,16 @@ type SingleProductWithParent struct {
 }
 
 func (SingleProductWithParent) TableName() string {
+	return "single_products"
+}
+
+type SingleProductStock struct {
+	ID          uint64             `gorm:"primaryKey;autoIncrement;not null"`
+	ProductID   uint64             `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
+	Product     *ProductSimpleInfo `gorm:"foreignKey:ProductID" json:"product,omitempty"`
+	SPInventory *model.SPInventory `gorm:"foreignKey:SingleProductID;references:ID" json:"inventory"`
+}
+
+func (SingleProductStock) TableName() string {
 	return "single_products"
 }

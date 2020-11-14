@@ -15,12 +15,15 @@ func Init() *echo.Echo {
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 	}))
 
-	productGroup := e.Group("/products")
 	// productGroup.Use(appMid.CheckAuthMiddleware, appMid.AdminRoleMiddleware)
 	InitAuthRoute()
 	authGroup := e.Group("/auth")
-
-	product.ProductGroup(productGroup)
 	AuthGroup(authGroup)
+
+	productGroup := e.Group("/products")
+	product.SetProductGroup(productGroup)
+
+	InventoryGroup := e.Group("/inventory")
+	SetInventoryGroup(InventoryGroup)
 	return e
 }

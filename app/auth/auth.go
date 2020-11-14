@@ -19,7 +19,7 @@ func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func GenerateJWT(user *model.PublicUser) (string, error) {
+func GenerateJWT(user *model.CredUser) (string, error) {
 	claim := model.Claim{
 		User: user,
 		StandardClaims: jwt.StandardClaims{

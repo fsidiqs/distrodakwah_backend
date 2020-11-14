@@ -9,6 +9,11 @@ import (
 
 type ProductStatus uint8
 
+const (
+	ProductKindSingle  = 1
+	ProductKindVariant = 2
+)
+
 // Product is base product table
 type Product struct {
 	ID            uint64                  `gorm:"primaryKey;autoIncrement;not null"`
@@ -84,12 +89,25 @@ type ProductFromRequest struct {
 	*request.VariantProductDetailReq `json:"variant_product_detail,omitempty"`
 }
 
-// func (p *SaveProduct) UnmarshalJSON(data []byte) error {
-// 	var v map[string]interface{}
-// 	if err := json.Unmarshal(data, &v); err != nil {
-// 		return err
-// 	}
+type ProductSimpleInfo struct {
+	ID        uint64         `gorm:"primaryKey;autoIncrement;not null"`
+	Sku       string         `json:"sku"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+}
 
-// 	fmt.Printf("fajar %+v\n", v)
-// 	return nil
-// }
+func (ProductSimpleInfo) TableName() string {
+	return "products"
+}
+
+type ProductInventory struct {
+	ID  uint64 `gorm:"primaryKey;autoIncrement;not null"`
+	Sku string `json:"sku"`
+
+	SingleProduct *SingleProductStock `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
+
+	VariantProducts []*VariantProductStock `gorm:"foreignKey:ProductID;references:ID" json:"variant_product,omitempty"`
+}
+
+func (ProductInventory) TableName() string {
+	return "products"
+}

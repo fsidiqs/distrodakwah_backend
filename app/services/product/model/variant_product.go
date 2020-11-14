@@ -1,5 +1,7 @@
 package model
 
+import "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
+
 type VariantProduct struct {
 	ID        uint64 `gorm:"primaryKey;autoIncrement;not null"`
 	ProductID uint64 `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
@@ -29,5 +31,17 @@ type VariantProductWithParent struct {
 }
 
 func (VariantProductWithParent) TableName() string {
+	return "variant_products"
+}
+
+type VariantProductStock struct {
+	ID          uint64             `gorm:"primaryKey;autoIncrement;not null"`
+	Sku         string             `json:"sku"`
+	ProductID   uint64             `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
+	Product     *ProductSimpleInfo `gorm:"foreignKey:ProductID" json:"product,omitempty"`
+	VPInventory *model.VPInventory `gorm:"foreignKey:VariantProductID;references:ID" json:"inventory"`
+}
+
+func (VariantProductStock) TableName() string {
 	return "variant_products"
 }

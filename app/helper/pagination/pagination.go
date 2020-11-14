@@ -22,6 +22,18 @@ type Pagination struct {
 	Metadata *Metadata   `json:"metadata"`
 }
 
+func (p *Pagination) Paginate(m *Metadata) {
+
+	page, limit, offset := BuildPagination(m)
+	p.Metadata = &Metadata{
+		Total:  p.Metadata.Total,
+		Limit:  limit,
+		Offset: offset,
+		Page:   page,
+		Pages:  BuildPages(p.Metadata.Total, limit),
+	}
+}
+
 func (p *Pagination) UpdateElements(e interface{}) {
 	p.Elements = e
 }

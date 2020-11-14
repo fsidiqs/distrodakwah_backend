@@ -27,7 +27,7 @@ func (uc *UserController) Login(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, "login failed")
 	}
-	publicUser := &model.PublicUser{
+	publicUser := &model.CredUser{
 		Email: user.Email,
 	}
 	token, err := auth.GenerateJWT(publicUser)
