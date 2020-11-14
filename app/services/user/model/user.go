@@ -16,7 +16,7 @@ type User struct {
 	RoleID    uint8          `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"role_id"`
 }
 
-type PublicUser struct {
+type CredUser struct {
 	Email string
 }
 

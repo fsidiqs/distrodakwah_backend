@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/middleware"
+
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/controller"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
 )
@@ -17,10 +19,17 @@ func Init() {
 	productController = controller.ProductController{&productRepository}
 }
 
-func ProductGroup(g *echo.Group) {
+func productAuthGroup(g *echo.Group) {
 	g.GET("", productController.Gets)
 	g.POST("", productController.Post)
 	g.POST("/create-product-basic-structure", productController.CreateProductBasicStructure)
+
+}
+
+func SetProductGroup(g *echo.Group) {
+
+	authGroup := g.Group("", middleware.CheckAuthMiddleware, middleware.AdminRoleMiddleware)
+	productAuthGroup(authGroup)
 
 	g.GET("/generate-price-template", productController.GeneratePriceTemplate)
 	g.POST("/import-prices", productController.ImportPrices)
@@ -37,6 +46,4 @@ func ProductGroup(g *echo.Group) {
 	g.POST("/departments", productController.PostDepartment)
 	g.POST("/subdepartments", productController.PostSubdepartment)
 	g.POST("/categories", productController.PostCategory)
-
-	// g.Group("/auth", appMid.CheckAuthMiddleware, appMid.AdminRoleMiddleware)
 }

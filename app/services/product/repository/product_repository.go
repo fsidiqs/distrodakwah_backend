@@ -149,11 +149,10 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.Prod
 
 	var err error
 	tx := r.DB.Begin()
-	productImagesReq := &model.ProductImages{}
+	productImagesReq := &productReqJSON.ProductImages
 	// convert product image request array into db like struct
 
 	//  STEP create product image
-	err = json.NewDecoder(strings.NewReader(productReqJSON.ProductImages)).Decode(&productImagesReq)
 	err = productImagesReq.Validate()
 	if err != nil {
 		fmt.Println("product images are invalid")
@@ -326,8 +325,6 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *model.Prod
 		}
 
 	}
-
-	// 5. Create Single Product Prices
 
 	return tx.Commit().Error
 }
