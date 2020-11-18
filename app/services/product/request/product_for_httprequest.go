@@ -9,9 +9,10 @@ var (
 )
 
 type SingleProductDetailReq struct {
-	Sku    string  `json:"sku"`
-	Price  float64 `json:"harga_jual"`
-	Weight int     `json:"weight"`
+	VendorID uint32  `json:"vendor_id"`
+	Sku      string  `json:"sku"`
+	Price    float64 `json:"harga_jual"`
+	Weight   int     `json:"weight"`
 }
 
 func (p *SingleProductDetailReq) Validate() error {
@@ -22,6 +23,7 @@ func (p *SingleProductDetailReq) Validate() error {
 }
 
 type VariantProductDetailReq struct {
+	VendorID     uint32                      `json:"vendor_id"`
 	Sku          string                      `json:"sku"`
 	SellingPrice float64                     `json:"harga_jual"`
 	Weight       int                         `json:"weight"`

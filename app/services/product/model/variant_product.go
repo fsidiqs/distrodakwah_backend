@@ -39,6 +39,7 @@ type VariantProductStock struct {
 	Sku         string             `json:"sku"`
 	ProductID   uint64             `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
 	Product     *ProductSimpleInfo `gorm:"foreignKey:ProductID" json:"product,omitempty"`
+	Weight      int                `gorm:"type:INT;UNSIGNED;NOT NULL" json:"weight"`
 	VPInventory *model.VPInventory `gorm:"foreignKey:VariantProductID;references:ID" json:"inventory"`
 }
 

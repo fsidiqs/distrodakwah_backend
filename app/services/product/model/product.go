@@ -3,7 +3,6 @@ package model
 import (
 	"time"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
 	"gorm.io/gorm"
 )
 
@@ -75,24 +74,11 @@ type ProductFromRequestJSON struct {
 	Sku                  string `json:"sku"`
 }
 
-type ProductFromRequest struct {
-	BrandID                          uint          `json:"brand_id"`
-	CategoryID                       uint          `json:"category_id"`
-	ProductTypeID                    uint8         `json:"product_type_id"`
-	ProductKindID                    uint8         `json:"product_kind_id"`
-	Name                             string        `json:"name"`
-	Description                      string        `json:"description"`
-	Status                           ProductStatus `json:"status"`
-	ProductImages                    ProductImages `json:"product_images"`
-	Sku                              string        `json:"sku"`
-	*request.SingleProductDetailReq  `json:"single_product_detail,omitempty"`
-	*request.VariantProductDetailReq `json:"variant_product_detail,omitempty"`
-}
-
 type ProductSimpleInfo struct {
-	ID        uint64         `gorm:"primaryKey;autoIncrement;not null"`
-	Sku       string         `json:"sku"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	ID            uint64         `gorm:"primaryKey;autoIncrement;not null"`
+	ProductKindID uint8          `json:"product_kind_id"`
+	Sku           string         `json:"sku"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 }
 
 func (ProductSimpleInfo) TableName() string {
@@ -100,14 +86,27 @@ func (ProductSimpleInfo) TableName() string {
 }
 
 type ProductInventory struct {
-	ID  uint64 `gorm:"primaryKey;autoIncrement;not null"`
-	Sku string `json:"sku"`
-
+	ID            uint64              `gorm:"primaryKey;autoIncrement;not null"`
+	Sku           string              `json:"sku"`
+	ProductKindID uint8               `json:"product_kind_id"`
 	SingleProduct *SingleProductStock `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
 
 	VariantProducts []*VariantProductStock `gorm:"foreignKey:ProductID;references:ID" json:"variant_product,omitempty"`
 }
 
 func (ProductInventory) TableName() string {
+	return "products"
+}
+
+type ProductInventoryForFetch struct {
+	ID            uint64              `gorm:"primaryKey;autoIncrement;not null"`
+	Sku           string              `json:"sku"`
+	ProductKindID uint8               `json:"product_kind_id"`
+	SingleProduct *SingleProductStock `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
+
+	VariantProduct *VariantProductStock `gorm:"foreignKey:ProductID;references:ID" json:"variant_product,omitempty"`
+}
+
+func (ProductInventoryForFetch) TableName() string {
 	return "products"
 }

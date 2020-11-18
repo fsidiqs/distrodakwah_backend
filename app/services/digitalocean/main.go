@@ -3,6 +3,7 @@ package digitalocean
 import (
 	"fmt"
 	"mime/multipart"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -30,7 +31,7 @@ func UploadFiles(files []multipart.File) ([]string, error) {
 		result, err := uploader.Upload(&s3manager.UploadInput{
 			ACL:         aws.String("public-read"),
 			Bucket:      aws.String(BUCKET),
-			Key:         aws.String("dd_product_images/test.png"),
+			Key:         aws.String(fmt.Sprintf("dd_product_images/test%v", time.Now().Unix())),
 			Body:        file,
 			ContentType: aws.String("image/jpeg"),
 		})

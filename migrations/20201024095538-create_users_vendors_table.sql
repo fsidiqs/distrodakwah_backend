@@ -8,9 +8,8 @@ CREATE TABLE IF NOT EXISTS `users_vendors`(
     `address` VARCHAR(255) NOT NULL,
     `status` TINYINT UNSIGNED NOT NULL DEFAULT 0,
     `created_at` timestamp NULL DEFAULT NULL,
-    `deleted_at` timestamp NULL DEFAULT NULL
+    `deleted_at` timestamp NULL DEFAULT NULL,
     CONSTRAINT users_vendors_user_id FOREIGN KEY(user_id) references users(id)
-
 ) Engine = InnoDB;
 
 -- +migrate Down

@@ -3,8 +3,10 @@ package repository
 import (
 	"sort"
 
-	modelHelper "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/model"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
+	invModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
+	invModelAux "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model/aux"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/request"
 	prodModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 )
@@ -18,6 +20,11 @@ func (r *InventoryRepository) FetchAll(req *request.FetchAllReq) (*pagination.Pa
 	// inventories := []*model.InventoryResponse{}
 	products := []*prodModel.ProductSimpleInfo{}
 	productQ := r.DB.Model(&prodModel.ProductSimpleInfo{}).Unscoped()
+
+	if len(req.ProductIDArr) > 0 {
+		productQ = productQ.Where("products.id IN (?)", req.ProductIDArr)
+	}
+	// count
 	err = productQ.Count(&total).Error
 	res.Metadata.UpdateTotal(total)
 	res.Paginate(req.Metadata)
@@ -52,16 +59,22 @@ func (r *InventoryRepository) FetchAll(req *request.FetchAllReq) (*pagination.Pa
 		return nil, err
 	}
 
-	inventories := []*modelHelper.InventoryResponse{}
+	inventories := []*prodModel.ProductInventoryForFetch{}
 
 	for _, sp := range singleProducts {
-		inventories = append(inventories, &modelHelper.InventoryResponse{
+		inventories = append(inventories, &prodModel.ProductInventoryForFetch{
+			ID:            sp.ProductID,
+			ProductKindID: sp.Product.ProductKindID,
+			Sku:           sp.Product.Sku,
 			SingleProduct: sp,
 		})
 	}
 
 	for _, vp := range variantProducts {
-		inventories = append(inventories, &modelHelper.InventoryResponse{
+		inventories = append(inventories, &prodModel.ProductInventoryForFetch{
+			ID:             vp.ProductID,
+			ProductKindID:  vp.Product.ProductKindID,
+			Sku:            vp.Product.Sku,
 			VariantProduct: vp,
 		})
 	}
@@ -103,6 +116,7 @@ func (r *InventoryRepository) ExportInventory() ([]*prodModel.ProductInventory, 
 			&prodModel.ProductInventory{
 				ID:            prod.ID,
 				Sku:           prod.Sku,
+				ProductKindID: prod.ProductKindID,
 				SingleProduct: prod.SingleProduct,
 			},
 		)
@@ -114,6 +128,7 @@ func (r *InventoryRepository) ExportInventory() ([]*prodModel.ProductInventory, 
 			&prodModel.ProductInventory{
 				ID:              prod.ID,
 				Sku:             prod.Sku,
+				ProductKindID:   prod.ProductKindID,
 				VariantProducts: prod.VariantProducts,
 			},
 		)
@@ -124,4 +139,43 @@ func (r *InventoryRepository) ExportInventory() ([]*prodModel.ProductInventory, 
 		return returnedData[i].ID < returnedData[j].ID
 	})
 	return returnedData, nil
+}
+
+type FindReq struct {
+	RelatedID     uint64
+	ProductKindID uint8
+	Preload       httphelper.Preload
+}
+
+func (ir *InventoryRepository) Find(req FindReq) (*invModelAux.InventoryResponse, error) {
+	var err error
+	var inv *invModelAux.InventoryResponse
+
+	if req.ProductKindID == prodModel.ProductKindSingle {
+		inv = &invModelAux.InventoryResponse{
+			SPInventory: &invModel.SPInventory{},
+		}
+		query := ir.DB.Model(&invModel.SPInventory{}).
+			Where("sp_inventory.single_product_id = ?", req.RelatedID)
+
+		if req.Preload != nil { // check whether slice is empty
+			HandlePreload(query, req.Preload, prodModel.ProductKindSingle)
+		}
+		err = query.First(&inv.SPInventory).Error
+
+	} else if req.ProductKindID == prodModel.ProductKindVariant {
+		inv = &invModelAux.InventoryResponse{
+			VPInventory: &invModel.VPInventory{},
+		}
+
+		query := ir.DB.Debug().Model(&invModel.VPInventory{}).
+			Where("vp_inventory.variant_product_id = ?", req.RelatedID)
+
+		if req.Preload != nil { // check whether slice is empty
+			HandlePreload(query, req.Preload, prodModel.ProductKindVariant)
+		}
+		err = query.First(&inv.VPInventory).Error
+	}
+
+	return inv, err
 }

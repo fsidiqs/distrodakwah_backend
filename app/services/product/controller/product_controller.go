@@ -14,7 +14,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/digitalocean"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model/aux"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
@@ -135,12 +134,13 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 		defer (theFiles[i]).Close()
 
 	}
-	fmt.Printf("%+v \n", files)
 
 	if productReq != "" {
 		err = json.NewDecoder(strings.NewReader(productReq)).Decode(&product)
 	}
-	productImageURLs, err := digitalocean.UploadFiles(theFiles)
+	// ! Update this
+	// ! productImageURLs, err := digitalocean.UploadFiles(theFiles)
+	productImageURLs := []string{"test.jpeg"}
 	for _, imgUrl := range productImageURLs {
 		product.ProductImages = append(
 			product.ProductImages,
@@ -149,7 +149,6 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 			},
 		)
 	}
-	fmt.Println("images jar: ", *product.ProductImages[0])
 
 	if err != nil {
 		fmt.Println(err.Error())

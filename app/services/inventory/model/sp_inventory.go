@@ -1,5 +1,10 @@
 package model
 
+var InitalSPInventory SPInventory = SPInventory{
+	Stock: 0,
+	Keep:  0,
+}
+
 type SPInventory struct {
 	ID                uint64             `gorm:"primaryKey;autoIncrement;not null"`
 	SingleProductID   uint64             `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"single_product_id"`

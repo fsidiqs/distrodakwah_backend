@@ -7,7 +7,7 @@ import (
 )
 
 type UserVendor struct {
-	ID          int32          `gorm:"primaryKey;autoIncrement;not null"`
+	ID          uint32         `gorm:"primaryKey;autoIncrement;not null"`
 	CreatedAt   time.Time      `json:"created_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Province    string         `gorm:"type:varchar(255);not null" json:"province"`

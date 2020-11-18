@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS `sp_inventory_adjustments` (
     `stock_before` INT UNSIGNED NOT NULL,
     `stock_after` INT UNSIGNED NOT NULL,
     `created_at` TIMESTAMP NULL,
-    CONSTRAINT sp_inventory_adjustments_sp_inventory_id FOREIGN KEY(sp_inventory_id) references sp_inventory(id)
+    CONSTRAINT sp_inventory_adjustments_sp_inventory_id FOREIGN KEY(sp_inventory_id) references sp_inventory(id),
+    CONSTRAINT sp_inventory_adjustments_user_id FOREIGN KEY(user_id) references users(id)
 ) ENGINE = InnoDB;
 
 -- +migrate Down
