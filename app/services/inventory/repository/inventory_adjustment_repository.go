@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"fmt"
-
 	prodModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
@@ -53,7 +51,6 @@ func (r *InventoryRepository) PerformStockAdjustment(stocksTempl []*invModelAux.
 	vpiAdj := []*invModel.VPInventoryAdjustment{}
 	spInventoriesLen := len(spInventories)
 	vpInventoriesLen := len(vpInventories)
-	fmt.Println("Fajar ", spInvIDArr)
 	for _, stock := range stocksTempl {
 		if stock.ProductKindID == prodModel.ProductKindSingle && spInventoriesLen > 0 {
 			// STEP find single product inventory DB by current StockRelatedProductID
@@ -101,7 +98,7 @@ func (r *InventoryRepository) PerformStockAdjustment(stocksTempl []*invModelAux.
 				},
 			)
 
-			err = tx.Debug().Model(&invModel.VPInventory{}).Where("variant_product_id = ?", stock.RelatedProductID).Update("stock", stock.Stock).Error
+			err = tx.Model(&invModel.VPInventory{}).Where("variant_product_id = ?", stock.RelatedProductID).Update("stock", stock.Stock).Error
 
 		}
 	}

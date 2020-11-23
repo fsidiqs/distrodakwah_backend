@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r *ProductRepository) SaveSingleProductPricesTx(singleProductPrices []*model.SingleProductsPrices, tx *gorm.DB) error {
-	err := tx.Model(&model.SingleProductsPrices{}).Create(&singleProductPrices).Error
+func (r *ProductRepository) SaveSingleProductPricesTx(singleProductPrices model.SingleProductsPriceArr, tx *gorm.DB) error {
+	err := tx.Model(&model.SingleProductsPrice{}).Create(&singleProductPrices).Error
 	if err != nil {
 		fmt.Printf("error creating Single Product Prices\n %+v \n", err)
 		tx.Rollback()

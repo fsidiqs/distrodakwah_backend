@@ -168,7 +168,7 @@ func (ir *InventoryRepository) Find(req FindReq) (*invModelAux.InventoryResponse
 			VPInventory: &invModel.VPInventory{},
 		}
 
-		query := ir.DB.Debug().Model(&invModel.VPInventory{}).
+		query := ir.DB.Model(&invModel.VPInventory{}).
 			Where("vp_inventory.variant_product_id = ?", req.RelatedID)
 
 		if req.Preload != nil { // check whether slice is empty

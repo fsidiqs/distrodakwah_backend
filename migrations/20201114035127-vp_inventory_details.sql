@@ -1,5 +1,6 @@
 -- +migrate Up
 CREATE TABLE IF NOT EXISTS `vp_inventory_details` (
+    `id` BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     `vp_inventory_id` BIGINT UNSIGNED NOT NULL,
     `vendor_id` INT UNSIGNED NOT NULL,
     CONSTRAINT vp_inventory_details_vp_inventory_id FOREIGN KEY(vp_inventory_id) references vp_inventory(id) ON DELETE CASCADE,

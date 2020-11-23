@@ -12,13 +12,13 @@ type M map[string]interface{}
 func (r *ProductRepository) GeneratePriceTemplate(productIDArr []int) (*aux.ProductPriceTemplate, error) {
 
 	// ! reconstruct code with getting each table product
-	singleProductPrices := model.SingleProductsPricesArrWithParent{}
-	err := r.DB.Model(&model.SingleProductsPricesWithParent{}).
+	singleProductPrices := model.SingleProductsPriceArrWithParent{}
+	err := r.DB.Model(&model.SingleProductsPriceWithParent{}).
 		Preload("SingleProduct.Product").
 		Find(&singleProductPrices).Error
 
-	variantProductPrices := model.VariantProductsPricesArrWithParent{}
-	err = r.DB.Model(&model.VariantProductsPricesWithParent{}).
+	variantProductPrices := model.VariantProductsPriceArrWithParent{}
+	err = r.DB.Model(&model.VariantProductsPriceWithParent{}).
 		Preload("VariantProduct.Product").
 		Find(&variantProductPrices).Error
 
@@ -65,11 +65,11 @@ func (r *ProductRepository) ImportPrices(priceTemplate *aux.ProductPriceTemplate
 	tx := r.DB.Begin()
 
 	if len(priceTemplate.SingleProductPricesTemplate) > 0 {
-		singleProductPricesReq := []*model.SingleProductsPrices{}
+		singleProductPricesReq := model.SingleProductsPriceArr{}
 		for _, sReq := range priceTemplate.SingleProductPricesTemplate {
 			singleProductPricesReq = append(
 				singleProductPricesReq,
-				&model.SingleProductsPrices{
+				&model.SingleProductsPrice{
 					SingleProductID: sReq.SingleProductID,
 					Name:            sReq.PriceName,
 					Value:           sReq.PriceValue,
@@ -78,7 +78,7 @@ func (r *ProductRepository) ImportPrices(priceTemplate *aux.ProductPriceTemplate
 
 		}
 		// add validation here
-		err = tx.Model(&model.SingleProductsPrices{}).Create(&singleProductPricesReq).Error
+		err = tx.Model(&model.SingleProductsPrice{}).Create(&singleProductPricesReq).Error
 		if err != nil {
 			fmt.Printf("error creating product_images\n %+v \n", err)
 			tx.Rollback()
@@ -89,11 +89,11 @@ func (r *ProductRepository) ImportPrices(priceTemplate *aux.ProductPriceTemplate
 	if len(priceTemplate.VariantProductPriceTemplate) > 0 {
 		fmt.Println(len(priceTemplate.VariantProductPriceTemplate))
 		fmt.Println("salviro")
-		variantProductPricesReq := []*model.VariantProductsPrices{}
+		variantProductPricesReq := model.VariantProductsPriceArr{}
 		for _, sReq := range priceTemplate.VariantProductPriceTemplate {
 			variantProductPricesReq = append(
 				variantProductPricesReq,
-				&model.VariantProductsPrices{
+				&model.VariantProductsPrice{
 					VariantProductID: sReq.VariantProductID,
 					Name:             sReq.PriceName,
 					Value:            sReq.PriceValue,
@@ -103,7 +103,7 @@ func (r *ProductRepository) ImportPrices(priceTemplate *aux.ProductPriceTemplate
 		}
 
 		// add validation here
-		err = tx.Model(&model.VariantProductsPrices{}).Create(&variantProductPricesReq).Error
+		err = tx.Model(&model.VariantProductsPrice{}).Create(&variantProductPricesReq).Error
 		if err != nil {
 			fmt.Printf("error creating product_images\n %+v \n", err)
 			tx.Rollback()

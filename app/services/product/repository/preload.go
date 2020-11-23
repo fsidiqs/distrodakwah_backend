@@ -7,6 +7,7 @@ import (
 
 func HandlePreload(query *gorm.DB, pre *request.Preload) {
 	for _, value := range *pre {
+		// _ = value
 		if value == "belongs_to" {
 			query = query.Preload("ProductType").
 				Preload("Brand").

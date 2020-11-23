@@ -49,7 +49,7 @@ type ProductResponse struct {
 	ProductImages []*ProductsProductImage `gorm:"foreignKey:ProductID;references:ID" json:"product_images"`
 	Sku           string                  `gorm:"type:varchar(255);not null" json:"sku"`
 
-	SingleProduct *SingleProduct `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
+	SingleProduct *SingleProductWithPrices `gorm:"foreignKey:ProductID;references:ID" json:"single_product,omitempty"`
 
 	VariantProduct []*VariantProductFetch `gorm:"foreignKey:ProductID;references:ID" json:"variant_product,omitempty"`
 	Variants       []*Variant             `gorm:"foreignKey:ProductID;references:ID" json:"variants,omitempty"`

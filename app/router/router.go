@@ -25,5 +25,9 @@ func Init() *echo.Echo {
 
 	InventoryGroup := e.Group("/inventory")
 	SetInventoryGroup(InventoryGroup)
+
+	orderGroup := e.Group("/orders")
+	SetOrderGroup(orderGroup)
+
 	return e
 }

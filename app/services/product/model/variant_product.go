@@ -9,13 +9,20 @@ type VariantProduct struct {
 	Weight    int    `gorm:"type:INT;NOT NULL" json:"weight"`
 }
 
+type VariantProductPrices struct {
+	ID                    uint64                  `gorm:"primaryKey;autoIncrement;not null"`
+	ProductID             uint64                  `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
+	Weight                int                     `gorm:"type:INT;UNSIGNED;NOT NULL" json:"weight"`
+	VariantProductsPrices VariantProductsPriceArr `gorm:"foreignKey:VariantProductID;references:ID" json:"prices"`
+}
+
 type VariantProductFetch struct {
 	ID        uint64 `gorm:"primaryKey;autoIncrement;not null"`
 	ProductID uint64 `gorm:"column:product_id;type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
 	Sku       string `gorm:"type:varchar(255);not null" json:"sku"`
 	Weight    int    `gorm:"type:INT;NOT NULL" json:"weight"`
 
-	VariantProductsPrices []*VariantProductsPrices `gorm:"foreignKey:VariantProductID;references:ID" json:"prices"`
+	VariantProductsPrices VariantProductsPriceArr `gorm:"foreignKey:VariantProductID;references:ID" json:"prices"`
 }
 
 func (VariantProductFetch) TableName() string {

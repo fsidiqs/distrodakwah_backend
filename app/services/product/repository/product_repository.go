@@ -257,14 +257,14 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 
 		// STEP Of creating singleProductPriceArr
 
-		singleProductPriceArr := []*prodModel.SingleProductsPrices{
+		singleProductPriceArr := prodModel.SingleProductsPriceArr{
 			{
 				SingleProductID: singleProduct.ID,
 				Name:            request.HargaJualName,
 				Value:           SingleProductDetailReq.Price,
 			},
 		}
-		err = tx.Model(&prodModel.SingleProductsPrices{}).Create(&singleProductPriceArr).Error
+		err = tx.Model(&prodModel.SingleProductsPrice{}).Create(&singleProductPriceArr).Error
 		if err != nil {
 			fmt.Printf("error creating Single Product Prices\n %+v \n", err)
 			tx.Rollback()
@@ -294,7 +294,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 
 			// fmt.Printf("Error Before Creating VariantProduct \n %+v \n", variantProduct.VPInventory.VPInventoryDetail.VendorID)
 
-			err = tx.Debug().Model(&prodModel.VariantProductStock{}).Create(&variantProduct).Error
+			err = tx.Model(&prodModel.VariantProductStock{}).Create(&variantProduct).Error
 			if err != nil {
 				fmt.Printf("Error Creating VariantProduct \n %+v \n", err)
 				tx.Rollback()
@@ -302,13 +302,13 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 			}
 
 			//STEP variant_products_prices
-			variantProductPrice := &prodModel.VariantProductsPrices{
+			variantProductPrice := &prodModel.VariantProductsPrice{
 				VariantProductID: variantProduct.ID,
 				Name:             request.HargaJualName,
 				Value:            variantProductDetailReq.SellingPrice,
 			}
 
-			err = tx.Model(&prodModel.VariantProductsPrices{}).Create(&variantProductPrice).Error
+			err = tx.Model(&prodModel.VariantProductsPrice{}).Create(&variantProductPrice).Error
 			if err != nil {
 				fmt.Printf("Error Creating VariantProductsPrices \n %+v \n", err)
 				tx.Rollback()

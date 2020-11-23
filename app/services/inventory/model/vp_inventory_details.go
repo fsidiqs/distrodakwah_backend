@@ -3,6 +3,7 @@ package model
 import "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/user/model"
 
 type VPInventoryDetail struct {
+	ID            uint64            `gorm:"primaryKey;autoIncrement;not null"`
 	VPInventoryID uint64            `gorm:"type:BIGINT;UNSIGNEND;NOT NULL" json:"vp_inventory_id"`
 	VendorID      uint32            `gorm:"type:INT;UNSIGNED;NOT NULL" json:"vendor_id"`
 	UserVendor    *model.UserVendor `gorm:"foreignKey:VendorID" json:"vendor"`
