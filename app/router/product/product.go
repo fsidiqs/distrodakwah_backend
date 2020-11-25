@@ -23,6 +23,7 @@ func productAuthGroup(g *echo.Group) {
 	g.GET("", productController.Gets)
 	g.POST("", productController.Post)
 	g.POST("/create-product-basic-structure", productController.CreateProductBasicStructure)
+	g.PUT("/:product_id/edit", productController.UpdateProduct)
 
 }
 

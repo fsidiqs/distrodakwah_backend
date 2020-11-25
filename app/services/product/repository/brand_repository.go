@@ -29,9 +29,9 @@ func (r *ProductRepository) CreateBrand(req *request.BrandReq) error {
 	}
 
 	brand := &model.Brand{
-		ImageID:  image.ID,
-		Name:     req.Name,
-		VendorID: req.VendorID,
+		ImageID:      image.ID,
+		Name:         req.Name,
+		UserVendorID: req.UserVendorID,
 	}
 
 	err = tx.Model(&model.Brand{}).Create(&brand).Error

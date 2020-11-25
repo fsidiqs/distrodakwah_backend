@@ -2,17 +2,15 @@ package request
 
 import "errors"
 
-const HargaJualName = "Harga Jual"
+const HargaJualName = "jual"
 
 var (
-	ErrHargaJualEmpty = errors.New("HargaJual is empty")
+	ErrHargaJualEmpty = errors.New("harga 'jual' is empty")
 )
 
 type SingleProductDetailReq struct {
-	VendorID uint32  `json:"vendor_id"`
-	Sku      string  `json:"sku"`
-	Price    float64 `json:"harga_jual"`
-	Weight   int     `json:"weight"`
+	Price  float64 `json:"harga_jual"`
+	Weight int     `json:"weight"`
 }
 
 func (p *SingleProductDetailReq) Validate() error {
@@ -23,7 +21,6 @@ func (p *SingleProductDetailReq) Validate() error {
 }
 
 type VariantProductDetailReq struct {
-	VendorID     uint32                      `json:"vendor_id"`
 	Sku          string                      `json:"sku"`
 	SellingPrice float64                     `json:"harga_jual"`
 	Weight       int                         `json:"weight"`

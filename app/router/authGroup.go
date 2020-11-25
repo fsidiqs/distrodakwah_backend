@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -27,8 +26,6 @@ func AuthGroup(g *echo.Group) {
 	g.POST("/login", userController.Login)
 
 	g.GET("", func(c echo.Context) error {
-		fmt.Println("test ", c.(*middleware.UserContext))
-
 		return c.JSON(http.StatusOK, "ok")
 	}, middleware.CheckAuthMiddleware, middleware.AdminRoleMiddleware)
 }

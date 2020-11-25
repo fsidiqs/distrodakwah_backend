@@ -13,6 +13,11 @@ const (
 	ProductKindVariant = 2
 )
 
+const (
+	ProductTypeConsignment = 1
+	ProductTypeVendor      = 2
+)
+
 // Product is base product table
 type Product struct {
 	ID            uint64                  `gorm:"primaryKey;autoIncrement;not null"`

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
 	invModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 	prodModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
@@ -230,6 +232,19 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 	// 4.a create singleProduct
 	if productReqJSON.ProductKindID == 1 {
 
+		// set uservendor id, if type is a vendor then find vendor, else use vendorid 1 (distrodakwah)
+		brandDB := &model.Brand{}
+		if productReqJSON.ProductTypeID == model.ProductTypeVendor {
+			err = database.DB.Model(&model.Brand{}).Where("id = ?", productReqJSON.BrandID).Find(&brandDB).Error
+		} else {
+			brandDB.UserVendorID = model.ProductTypeConsignment
+		}
+
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
 		SingleProductDetailReq := &request.SingleProductDetailReq{}
 		err = json.NewDecoder(strings.NewReader(productReqJSON.SingleProductDetail)).Decode(&SingleProductDetailReq)
 		// STEP ofCreating single product
@@ -237,7 +252,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 			Keep:  0,
 			Stock: 0,
 			SPInventoryDetail: &invModel.SPInventoryDetail{
-				VendorID: SingleProductDetailReq.VendorID,
+				VendorID: brandDB.UserVendorID,
 			},
 		}
 
@@ -247,7 +262,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 			SPInventory: initSPInventory,
 		}
 
-		err = tx.Model(&prodModel.SingleProductStock{}).Create(&singleProduct).Error
+		err = tx.Debug().Model(&prodModel.SingleProductStock{}).Create(&singleProduct).Error
 
 		if err != nil {
 			fmt.Printf("Error Creating Single Product \n %+v \n", err)
@@ -276,13 +291,21 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 		err = json.NewDecoder(strings.NewReader(productReqJSON.VariantProductDetail)).Decode(&variantProductDetailReqs)
 		//STEP VariantProduct Create
 
+		// set uservendor id, if type is a vendor then find vendor, else use vendorid 1 (distrodakwah)
+		brandDB := &model.Brand{}
+		if productReqJSON.ProductTypeID == model.ProductTypeVendor {
+			err = database.DB.Model(&model.Brand{}).Where("id = ?", productReqJSON.BrandID).Find(&brandDB).Error
+		} else {
+			brandDB.UserVendorID = model.ProductTypeConsignment
+		}
+
 		for _, variantProductDetailReq := range variantProductDetailReqs {
 			// Creating VariantProduct
 			initVPInventory := &invModel.VPInventory{
 				Keep:  0,
 				Stock: 0,
 				VPInventoryDetail: &invModel.VPInventoryDetail{
-					VendorID: variantProductDetailReq.VendorID,
+					VendorID: brandDB.UserVendorID,
 				},
 			}
 			variantProduct := &prodModel.VariantProductStock{

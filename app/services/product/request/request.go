@@ -19,9 +19,9 @@ type CategoryReq struct {
 }
 
 type BrandReq struct {
-	VendorID uint   `json:"vendor_id"`
-	Name     string `json:"name"`
-	Image    string `json:"image"`
+	UserVendorID uint32 `json:"user_vendor_id"`
+	Name         string `json:"name"`
+	Image        string `json:"image"`
 }
 
 type DepartmentReq struct {

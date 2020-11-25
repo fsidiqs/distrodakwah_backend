@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	productClass "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/class"
+
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
@@ -113,7 +115,7 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 	files := formReq.File["product_images"]
 	product := &model.ProductFromRequestJSON{}
 
-	theFiles := make([]multipart.File, len(files))
+	theFiles := make([]productClass.ProductImage, len(files))
 
 	for i, file := range files {
 		// Source
@@ -121,37 +123,40 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 		src, err := file.Open()
 
 		if err != nil {
+			fmt.Println(err)
 			return err
 		}
 		defer src.Close()
 
 		// Destination
-		theFiles[i], err = file.Open()
-
+		theFiles[i].FileName = file.Filename
+		theFiles[i].Content, err = file.Open()
 		if err != nil {
 			return err
 		}
-		defer (theFiles[i]).Close()
+		defer theFiles[i].Content.Close()
 
 	}
 
+	// ! Update this
+	// productImageURLs, err := digitalocean.UploadFiles(theFiles)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Image Upload failed")
+	}
 	if productReq != "" {
 		err = json.NewDecoder(strings.NewReader(productReq)).Decode(&product)
 	}
-	// ! Update this
-	// ! productImageURLs, err := digitalocean.UploadFiles(theFiles)
 	productImageURLs := []string{"test.jpeg"}
-	for _, imgUrl := range productImageURLs {
+	for _, imgURL := range productImageURLs {
 		product.ProductImages = append(
 			product.ProductImages,
 			&model.ProductImage{
-				URL: imgUrl,
+				URL: imgURL,
 			},
 		)
 	}
 
 	if err != nil {
-		fmt.Println(err.Error())
 		return c.JSON(http.StatusBadRequest, httphelper.BadRequestMessage)
 	}
 
@@ -160,8 +165,18 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 		fmt.Printf("error creating product: %+v", err)
 		return c.JSON(http.StatusInternalServerError, httphelper.InternalServerErrorMessage)
 	}
-
+	fmt.Println("asd")
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
+}
+
+func (pc *ProductController) UpdateProduct(c echo.Context) (err error) {
+	// formReq, _ := c.MultipartForm()
+	productReq := c.FormValue("product")
+	editProductReq := &productClass.EditProductReq{}
+	err = json.NewDecoder(strings.NewReader(productReq)).Decode(&editProductReq)
+
+	_ = editProductReq.ProductDetailJSONDecoder()
+	return nil
 }
 
 func (pc *ProductController) ImportPrices(c echo.Context) error {
