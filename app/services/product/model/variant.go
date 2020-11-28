@@ -17,3 +17,5 @@ type VariantFetch struct {
 func (VariantFetch) TableName() string {
 	return "variants"
 }
+
+type VariantArr []Variant

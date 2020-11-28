@@ -172,10 +172,8 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 func (pc *ProductController) UpdateProduct(c echo.Context) (err error) {
 	// formReq, _ := c.MultipartForm()
 	productReq := c.FormValue("product")
-	editProductReq := &productClass.EditProductReq{}
-	err = json.NewDecoder(strings.NewReader(productReq)).Decode(&editProductReq)
 
-	_ = editProductReq.ProductDetailJSONDecoder()
+	_, err = productClass.ProductDetailJSONDecoder(productReq)
 	return nil
 }
 
