@@ -8,7 +8,6 @@ import (
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
 	invModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 	prodModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
@@ -149,11 +148,11 @@ func (r *ProductRepository) SaveProductTx(product *prodModel.Product, tx *gorm.D
 	return nil
 }
 
-func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.ProductFromRequestJSON) error {
+func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *request.ProductFromRequestJSON) error {
 
 	var err error
 	tx := r.DB.Begin()
-	productImagesReq := &productReqJSON.ProductImages
+	productImagesReq := productReqJSON.ProductImages
 	// convert product image request array into db like struct
 
 	//  STEP create product image
@@ -169,20 +168,6 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 		return err
 	}
 
-	//  STEP create product prices
-
-	// if productReqJSON.ProductKindID == 1 {
-
-	// 	err = json.NewDecoder(strings.NewReader(productReqJSON.SingleProductDetail)).Decode(&productImagesReq)
-	// 	err = productReqJSON.ProductDetail.SingleProductHargaJual.Validate()
-	// } else if productReqJSON.ProductKindID == 2 {
-
-	// }
-	if err != nil {
-		fmt.Printf("%+v \n", err)
-		return err
-	}
-
 	// STEP Create Product and prepare returned result
 	productRes := &prodModel.Product{
 		BrandID:       productReqJSON.BrandID,
@@ -192,7 +177,6 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 		Status:        productReqJSON.Status,
 		Name:          productReqJSON.Name,
 		Description:   productReqJSON.Description,
-		Sku:           productReqJSON.Sku,
 	}
 
 	err = tx.Model(&prodModel.Product{}).Create(&productRes).Error
@@ -205,11 +189,11 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 
 	//  Create ProductsProductImages
 
-	var productsProductImages []*prodModel.ProductsProductImage
-	for _, pi := range *productImagesReq {
+	var productsProductImages []prodModel.ProductsProductImage
+	for _, pi := range productImagesReq {
 		productsProductImages = append(
 			productsProductImages,
-			&prodModel.ProductsProductImage{
+			prodModel.ProductsProductImage{
 				ProductID:      productRes.ID,
 				ProductImageID: pi.ID,
 			},
@@ -219,154 +203,109 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *prodModel.
 	err = tx.Model(&prodModel.ProductsProductImage{}).Create(&productsProductImages).Error
 	if err != nil {
 		fmt.Printf("error creating ProductsProductImages\n %+v \n", err)
-		fmt.Println("test")
-
 		tx.Rollback()
 		return err
 	}
+	// STEP of creating Items
+	itemReqs := []request.ItemCreateBasicProduct{}
+	err = json.NewDecoder(strings.NewReader(productReqJSON.Items)).Decode(&itemReqs)
+	items := []prodModel.Item{}
+
+	if productReqJSON.ProductKindID == prodModel.ProductKindVariant {
+		variantCreateReqs := []*prodModel.Variant{}
+		err = json.NewDecoder(strings.NewReader(productReqJSON.Variants)).Decode(&variantCreateReqs)
+		for _, v := range variantCreateReqs {
+			v.ProductID = productRes.ID
+		}
+		err = tx.Model(&prodModel.Variant{}).Create(&variantCreateReqs).Error
+		if err != nil {
+			fmt.Println("product creating variants")
+			return err
+		}
+
+		for idx, itemReq := range itemReqs {
+			// STEP of creating options
+			optionCreateReqs := []prodModel.Option{}
+			err = json.NewDecoder(strings.NewReader(itemReq.Options)).Decode(&optionCreateReqs)
+
+			// populate option itemID
+			for i := 0; i < len(optionCreateReqs); i++ {
+				optionCreateReqs[i].VariantID = variantCreateReqs[idx].ID
+			}
+			items = append(items,
+				prodModel.Item{
+					ProductID: productRes.ID,
+					Weight:    itemReq.Weight,
+					Sku:       itemReq.Sku,
+					Options:   optionCreateReqs,
+					Prices: []prodModel.ItemPrice{
+						{
+							Name:  request.RetailPriceName,
+							Value: itemReq.Price,
+						},
+					},
+				},
+			)
+
+		}
+
+	} else if productReqJSON.ProductKindID == prodModel.ProductKindSingle {
+		for _, itemReq := range itemReqs {
+			items = append(
+				items,
+				prodModel.Item{
+					ProductID: productRes.ID,
+					Sku:       itemReq.Sku,
+					Weight:    itemReq.Weight,
+					Prices: []prodModel.ItemPrice{
+						{
+							Name:  request.RetailPriceName,
+							Value: itemReq.Price,
+						},
+					},
+				},
+			)
+		}
+
+	}
+
+	err = tx.Model(&prodModel.Item{}).Create(&items).Error
+
 	if err != nil {
-		fmt.Println("product Repository error Creating ProductsProductImage")
+		fmt.Printf("Error Creating Single Product \n %+v \n", err)
+		tx.Rollback()
 		return err
 	}
 
-	// 4.a create singleProduct
-	if productReqJSON.ProductKindID == 1 {
+	brandDB := &prodModel.Brand{}
 
-		// set uservendor id, if type is a vendor then find vendor, else use vendorid 1 (distrodakwah)
-		brandDB := &model.Brand{}
-		if productReqJSON.ProductTypeID == model.ProductTypeVendor {
-			err = database.DB.Model(&model.Brand{}).Where("id = ?", productReqJSON.BrandID).Find(&brandDB).Error
-		} else {
-			brandDB.UserVendorID = model.ProductTypeConsignment
-		}
+	if productReqJSON.ProductTypeID == prodModel.ProductTypeVendor {
+		err = database.DB.Model(&prodModel.Brand{}).Where("id = ?", productReqJSON.BrandID).Find(&brandDB).Error
+	} else {
+		brandDB.UserVendorID = prodModel.ProductTypeConsignment
+	}
+	// STEP ofCreating single product
 
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-
-		SingleProductDetailReq := &request.SingleProductDetailReq{}
-		err = json.NewDecoder(strings.NewReader(productReqJSON.SingleProductDetail)).Decode(&SingleProductDetailReq)
-		// STEP ofCreating single product
-		initSPInventory := &invModel.SPInventory{
-			Keep:  0,
-			Stock: 0,
-			SPInventoryDetail: &invModel.SPInventoryDetail{
-				VendorID: brandDB.UserVendorID,
-			},
-		}
-
-		singleProduct := &prodModel.SingleProductStock{
-			ProductID:   productRes.ID,
-			Weight:      SingleProductDetailReq.Weight,
-			SPInventory: initSPInventory,
-		}
-
-		err = tx.Debug().Model(&prodModel.SingleProductStock{}).Create(&singleProduct).Error
-
-		if err != nil {
-			fmt.Printf("Error Creating Single Product \n %+v \n", err)
-			tx.Rollback()
-			return err
-		}
-
-		// STEP Of creating singleProductPriceArr
-
-		singleProductPriceArr := prodModel.SingleProductsPriceArr{
-			{
-				SingleProductID: singleProduct.ID,
-				Name:            request.HargaJualName,
-				Value:           SingleProductDetailReq.Price,
-			},
-		}
-		err = tx.Model(&prodModel.SingleProductsPrice{}).Create(&singleProductPriceArr).Error
-		if err != nil {
-			fmt.Printf("error creating Single Product Prices\n %+v \n", err)
-			tx.Rollback()
-			return err
-		}
-
-	} else if productReqJSON.ProductKindID == 2 {
-		variantProductDetailReqs := []*request.VariantProductDetailReq{}
-		err = json.NewDecoder(strings.NewReader(productReqJSON.VariantProductDetail)).Decode(&variantProductDetailReqs)
-		//STEP VariantProduct Create
-
-		// set uservendor id, if type is a vendor then find vendor, else use vendorid 1 (distrodakwah)
-		brandDB := &model.Brand{}
-		if productReqJSON.ProductTypeID == model.ProductTypeVendor {
-			err = database.DB.Model(&model.Brand{}).Where("id = ?", productReqJSON.BrandID).Find(&brandDB).Error
-		} else {
-			brandDB.UserVendorID = model.ProductTypeConsignment
-		}
-
-		for _, variantProductDetailReq := range variantProductDetailReqs {
-			// Creating VariantProduct
-			initVPInventory := &invModel.VPInventory{
-				Keep:  0,
-				Stock: 0,
-				VPInventoryDetail: &invModel.VPInventoryDetail{
+	itemInventories := []invModel.ItemInventory{}
+	for _, item := range items {
+		itemInventories = append(
+			itemInventories,
+			invModel.ItemInventory{
+				Keep:   0,
+				Stock:  0,
+				ItemID: item.ID,
+				ItemInventoryDetail: &invModel.ItemInventoryDetail{
 					VendorID: brandDB.UserVendorID,
 				},
-			}
-			variantProduct := &prodModel.VariantProductStock{
-				ProductID:   productRes.ID,
-				Sku:         variantProductDetailReq.Sku,
-				Weight:      variantProductDetailReq.Weight,
-				VPInventory: initVPInventory,
-			}
+			},
+		)
+	}
 
-			// fmt.Printf("Error Before Creating VariantProduct \n %+v \n", variantProduct.VPInventory.VPInventoryDetail.VendorID)
-
-			err = tx.Model(&prodModel.VariantProductStock{}).Create(&variantProduct).Error
-			if err != nil {
-				fmt.Printf("Error Creating VariantProduct \n %+v \n", err)
-				tx.Rollback()
-				return err
-			}
-
-			//STEP variant_products_prices
-			variantProductPrice := &prodModel.VariantProductsPrice{
-				VariantProductID: variantProduct.ID,
-				Name:             request.HargaJualName,
-				Value:            variantProductDetailReq.SellingPrice,
-			}
-
-			err = tx.Model(&prodModel.VariantProductsPrice{}).Create(&variantProductPrice).Error
-			if err != nil {
-				fmt.Printf("Error Creating VariantProductsPrices \n %+v \n", err)
-				tx.Rollback()
-				return err
-			}
-
-			//STEP Variants Create
-			for _, variantReq := range variantProductDetailReq.Variants {
-				variant := &prodModel.Variant{
-					ProductID: productRes.ID,
-					Name:      variantReq.VariantValue,
-				}
-				err = tx.Model(&prodModel.Variant{}).Create(&variant).Error
-				if err != nil {
-					fmt.Printf("Error Creating Variant \n %+v \n", err)
-					tx.Rollback()
-					return err
-				}
-
-				option := &prodModel.Option{
-					VariantID:        variant.ID,
-					Name:             variantReq.OptionValue,
-					VariantProductID: variantProduct.ID,
-				}
-				err = tx.Model(&prodModel.Option{}).Create(&option).Error
-				if err != nil {
-					fmt.Printf("Error Creating Option \n %+v \n", err)
-					tx.Rollback()
-					return err
-				}
-
-			}
-
-		}
-
+	err = tx.Debug().Model(&invModel.ItemInventory{}).Create(&itemInventories).Error
+	if err != nil {
+		fmt.Printf("Error Creating Single Product \n %+v \n", err)
+		tx.Rollback()
+		return err
 	}
 
 	return tx.Commit().Error

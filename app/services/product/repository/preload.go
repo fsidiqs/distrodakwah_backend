@@ -18,10 +18,10 @@ func HandlePreload(query *gorm.DB, pre *request.Preload) {
 			query = query.Preload("ProductImages.ProductImage")
 		} else if value == "product_detail" {
 			query = query.
-				// Preload("Category.")
-				Preload("SingleProduct.SingleProductsPrices").
-				Preload("VariantProduct.VariantProductsPrices"). //VariantProduct
-				Preload("Variants.Option")
+				Preload("Variants.Options").
+				Preload("Items").
+				Preload("Items.Prices")
+
 		}
 	}
 }

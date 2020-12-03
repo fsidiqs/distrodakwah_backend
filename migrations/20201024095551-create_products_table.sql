@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS `products` (
     `product_type_id` INT UNSIGNED NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `description` TEXT NOT NULL,
-    `sku` VARCHAR(255) NOT NULL,
     `status` TINYINT UNSIGNED NOT NULL DEFAULT 0,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,

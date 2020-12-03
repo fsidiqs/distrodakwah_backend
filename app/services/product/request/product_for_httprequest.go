@@ -1,33 +1,39 @@
 package request
 
-import "errors"
+import (
+	"errors"
 
-const HargaJualName = "jual"
-
-var (
-	ErrHargaJualEmpty = errors.New("harga 'jual' is empty")
+	prodModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 )
 
-type SingleProductDetailReq struct {
-	Price  float64 `json:"harga_jual"`
-	Weight int     `json:"weight"`
+const RetailPriceName = "retail"
+
+var (
+	ErrRetailPriceEmpty = errors.New("harga 'retail' is empty")
+)
+
+type ProductFromRequestJSON struct {
+	BrandID       uint   `json:"brand_id"`
+	CategoryID    uint   `json:"category_id"`
+	ProductTypeID uint8  `json:"product_type_id"`
+	ProductKindID uint8  `json:"product_kind_id"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	Status        uint8  `json:"status"`
+	ProductImages prodModel.ProductImages
+	Items         string `json:"items"`
+	Variants      string `json:"variants"`
 }
 
-func (p *SingleProductDetailReq) Validate() error {
-	if p.Price == 0 {
-		return ErrHargaJualEmpty
-	}
-	return nil
+type ItemCreateBasicProduct struct {
+	ID        uint64  `gorm:"primaryKey;autoIncrement;not null"`
+	ProductID uint64  `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
+	Sku       string  `json:"sku"`
+	Price     float64 `json:"retail_price"`
+	Weight    int     `json:"weight"`
+	Options   string  `json:"options"`
 }
 
-type VariantProductDetailReq struct {
-	Sku          string                      `json:"sku"`
-	SellingPrice float64                     `json:"harga_jual"`
-	Weight       int                         `json:"weight"`
-	Variants     []*VariantProductVariantReq `json:"variants"`
-}
-
-type VariantProductVariantReq struct {
-	VariantValue string `json:"variant_value"`
-	OptionValue  string `json:"option_value"`
+type OptionReq struct {
+	Option string `json:"option"`
 }

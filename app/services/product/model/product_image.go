@@ -18,7 +18,7 @@ var (
 	ErrProductImageEmptyURL = errors.New("ProductImage is empty")
 )
 
-type ProductImages []*ProductImage
+type ProductImages []ProductImage
 
 func (i *ProductImages) Validate() error {
 	for _, image := range *i {

@@ -17,7 +17,6 @@ import (
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model/aux"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
 )
@@ -99,7 +98,7 @@ func (pc *ProductController) Gets(c echo.Context) error {
 
 func (pc *ProductController) Post(c echo.Context) error {
 
-	product := &model.ProductFromRequestJSON{}
+	product := &request.ProductFromRequestJSON{}
 	// var product map[string]interface{}
 	if err := c.Bind(&product); err != nil {
 		fmt.Printf("error: %+v ", err)
@@ -113,7 +112,7 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 	formReq, _ := c.MultipartForm()
 	productReq := c.FormValue("product")
 	files := formReq.File["product_images"]
-	product := &model.ProductFromRequestJSON{}
+	product := &request.ProductFromRequestJSON{}
 
 	theFiles := make([]productClass.ProductImage, len(files))
 
@@ -150,7 +149,7 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 	for _, imgURL := range productImageURLs {
 		product.ProductImages = append(
 			product.ProductImages,
-			&model.ProductImage{
+			model.ProductImage{
 				URL: imgURL,
 			},
 		)
@@ -197,7 +196,7 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 		}
 		defer src.Close()
 
-		// Destination
+		// 	// Destination
 		theFile, err = file.Open()
 
 		if err != nil {
@@ -210,9 +209,10 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	pricesTemplate := &aux.ProductPriceTemplate{}
 
-	rows := xlsx.GetRows("Single Product Prices")
+	pricesXLSX := []model.ItemPrice{}
+
+	rows := xlsx.GetRows("Item Prices")
 	if err != nil {
 		return err
 	}
@@ -221,49 +221,21 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 	if rowsLen > 0 {
 
 		for i := 1; i < rowsLen; i++ {
-			tempSingleProductID, _ := strconv.ParseUint(rows[i][0], 10, 64)
-			tempPriceValue, _ := strconv.ParseFloat(rows[i][3], 10)
-			pricesTemplate.SingleProductPricesTemplate = append(
-				pricesTemplate.SingleProductPricesTemplate,
-				&model.SingleProductPriceTemplate{
-					SingleProductID: tempSingleProductID,
-
-					PriceName: rows[i][2],
-
-					PriceValue: tempPriceValue,
+			TempItemID, _ := strconv.ParseUint(rows[i][1], 10, 64)
+			tempPriceValue, _ := strconv.ParseFloat(rows[i][4], 10)
+			pricesXLSX = append(
+				pricesXLSX,
+				model.ItemPrice{
+					ItemID: TempItemID,
+					Name:   rows[i][3],
+					Value:  tempPriceValue,
 				},
 			)
 
 		}
 	}
 
-	rows = xlsx.GetRows("Variant Product Prices")
-	if err != nil {
-		return err
-	}
-
-	rowsLen = len(rows)
-
-	if rowsLen > 0 {
-		for i := 1; i < rowsLen; i++ {
-			tempVariantProductID, _ := strconv.ParseUint(rows[i][0], 10, 64)
-			tempPriceValue, _ := strconv.ParseFloat(rows[i][3], 10)
-
-			pricesTemplate.VariantProductPriceTemplate = append(
-				pricesTemplate.VariantProductPriceTemplate,
-				&model.VariantProductPriceTemplate{
-					VariantProductID: tempVariantProductID,
-
-					PriceName: rows[i][2],
-
-					PriceValue: tempPriceValue,
-				},
-			)
-
-		}
-	}
-
-	err = pc.ProductRepository.ImportPrices(pricesTemplate)
+	err = pc.ProductRepository.ImportPrices(pricesXLSX)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -284,31 +256,19 @@ func (pc *ProductController) GeneratePriceTemplate(c echo.Context) (err error) {
 	data, err := pc.ProductRepository.GeneratePriceTemplate(productIDArr)
 
 	xlsx := excelize.NewFile()
-	xlsx.NewSheet("Single Product Prices")
-	xlsx.SetCellValue("Single Product Prices", "A1", "Single Product ID")
-	xlsx.SetCellValue("Single Product Prices", "B1", "SKU")
-	xlsx.SetCellValue("Single Product Prices", "C1", "Nama Harga")
-	xlsx.SetCellValue("Single Product Prices", "D1", "Nilai Harga")
+	xlsx.NewSheet("Item Prices")
+	xlsx.SetCellValue("Item Prices", "A1", "Price ID")
+	xlsx.SetCellValue("Item Prices", "B1", "Item ID")
+	xlsx.SetCellValue("Item Prices", "C1", "Item SKU")
+	xlsx.SetCellValue("Item Prices", "D1", "Price Name")
+	xlsx.SetCellValue("Item Prices", "E1", "Price Value")
 
-	for index, singleProduct := range data.SingleProductPricesTemplate {
-		xlsx.SetCellValue("Single Product Prices", fmt.Sprintf("A%d", index+2), singleProduct.SingleProductID)
-		xlsx.SetCellValue("Single Product Prices", fmt.Sprintf("B%d", index+2), singleProduct.Sku)
-		xlsx.SetCellValue("Single Product Prices", fmt.Sprintf("C%d", index+2), singleProduct.PriceName)
-		xlsx.SetCellValue("Single Product Prices", fmt.Sprintf("D%d", index+2), singleProduct.PriceValue)
-
-	}
-
-	xlsx.NewSheet("Variant Product Prices")
-	xlsx.SetCellValue("Variant Product Prices", "A1", "Variant Product ID")
-	xlsx.SetCellValue("Variant Product Prices", "B1", "SKU")
-	xlsx.SetCellValue("Variant Product Prices", "C1", "Nama Harga")
-	xlsx.SetCellValue("Variant Product Prices", "D1", "Nilai Harga")
-
-	for index, variantProduct := range data.VariantProductPriceTemplate {
-		xlsx.SetCellValue("Variant Product Prices", fmt.Sprintf("A%d", index+2), variantProduct.VariantProductID)
-		xlsx.SetCellValue("Variant Product Prices", fmt.Sprintf("B%d", index+2), variantProduct.Sku)
-		xlsx.SetCellValue("Variant Product Prices", fmt.Sprintf("C%d", index+2), variantProduct.PriceName)
-		xlsx.SetCellValue("Variant Product Prices", fmt.Sprintf("D%d", index+2), variantProduct.PriceValue)
+	for index, price := range data {
+		xlsx.SetCellValue("Item Prices", fmt.Sprintf("A%d", index+2), price.ID)
+		xlsx.SetCellValue("Item Prices", fmt.Sprintf("B%d", index+2), price.ItemID)
+		xlsx.SetCellValue("Item Prices", fmt.Sprintf("C%d", index+2), price.ItemSku)
+		xlsx.SetCellValue("Item Prices", fmt.Sprintf("D%d", index+2), price.Name)
+		xlsx.SetCellValue("Item Prices", fmt.Sprintf("E%d", index+2), price.Value)
 
 	}
 
