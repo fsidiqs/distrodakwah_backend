@@ -9,9 +9,9 @@ import (
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
 	invModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
 	prodModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
+	"gorm.io/gorm"
 
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
-	"gorm.io/gorm"
 )
 
 func (r *ProductRepository) FetchByColumns(req *request.FetchByColumnReq) (*Pagination, error) {
@@ -119,33 +119,6 @@ func (p *Pagination) paginate(m *pagination.Metadata) {
 		Page:   page,
 		Pages:  pagination.BuildPages(p.Metadata.Total, limit),
 	}
-}
-
-func (r *ProductRepository) SaveProduct(product *prodModel.Product) (*prodModel.Product, error) {
-	// tx := r.DB.Begin()
-	// err := tx.Model(&prodModel.ProductImage{}).Create(product).Error
-
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return nil, err
-	// }
-
-	// return product, tx.Commit().Error
-	return nil, nil
-}
-
-func (r *ProductRepository) SaveProductTx(product *prodModel.Product, tx *gorm.DB) error {
-
-	// err := tx.Model(&prodModel.Product{}).Create(&product).Error
-	// fmt.Printf("product afters: %+v \n", product.ID)
-
-	// if err != nil {
-	// 	fmt.Printf("error creating product\n %+v \n", err)
-	// 	tx.Rollback()
-	// 	return nil
-	// }
-
-	return nil
 }
 
 func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *request.ProductFromRequestJSON) error {
@@ -309,4 +282,16 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *request.Pr
 	}
 
 	return tx.Commit().Error
+}
+
+func (r ProductRepository) TxUpdateProduct(tx *gorm.DB, productReq prodModel.Product) (*gorm.DB, error) {
+	var err error
+
+	err = tx.Model(&prodModel.Product{}).Where("id = ?", productReq.ID).Updates(productReq).Error
+	if err != nil {
+		fmt.Println("could not update product")
+		return nil, err
+	}
+
+	return tx, nil
 }

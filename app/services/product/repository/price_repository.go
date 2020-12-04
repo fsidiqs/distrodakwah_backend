@@ -5,6 +5,7 @@ import (
 
 	productModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 	productAuxModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model/aux"
+	"gorm.io/gorm"
 )
 
 type M map[string]interface{}
@@ -65,4 +66,17 @@ func (r *ProductRepository) ImportPrices(itemPriceArrReq []productModel.ItemPric
 	}
 
 	return tx.Commit().Error
+}
+
+func (r ProductRepository) TxUpdateItemPrices(tx *gorm.DB, itemPriceArrReq []productModel.ItemPrice) (*gorm.DB, error) {
+	var err error
+	for _, itemPrice := range itemPriceArrReq {
+		err = tx.Model(&productModel.ItemPrice{}).Where("id = ?", itemPrice.ID).Updates(itemPrice).Error
+		if err != nil {
+			fmt.Println("could not update item price")
+			return nil, err
+		}
+
+	}
+	return tx, nil
 }

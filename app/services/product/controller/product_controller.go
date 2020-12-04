@@ -9,16 +9,19 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
-	productClass "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/class"
+	"time"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/labstack/echo"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
+	productModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/request"
+	"gorm.io/gorm"
+
+	productLibrary "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/library"
 )
 
 type ProductController struct {
@@ -114,7 +117,7 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 	files := formReq.File["product_images"]
 	product := &request.ProductFromRequestJSON{}
 
-	theFiles := make([]productClass.ProductImage, len(files))
+	theFiles := make([]productLibrary.ProductImage, len(files))
 
 	for i, file := range files {
 		// Source
@@ -149,7 +152,7 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 	for _, imgURL := range productImageURLs {
 		product.ProductImages = append(
 			product.ProductImages,
-			model.ProductImage{
+			productModel.ProductImage{
 				URL: imgURL,
 			},
 		)
@@ -172,7 +175,34 @@ func (pc *ProductController) UpdateProduct(c echo.Context) (err error) {
 	// formReq, _ := c.MultipartForm()
 	productReq := c.FormValue("product")
 
-	_, err = productClass.ProductDetailJSONDecoder(productReq)
+	editProduct, err := productLibrary.ProductDecoder(productReq)
+
+	var deletedAt gorm.DeletedAt
+	if editProduct.DeletedAt == true {
+		deletedAt = gorm.DeletedAt{
+			Time: time.Now(),
+		}
+	} else {
+		deletedAt = gorm.DeletedAt{}
+	}
+	product := productModel.Product{
+		ID:            editProduct.ID,
+		UpdatedAt:     time.Now(),
+		DeletedAt:     deletedAt,
+		BrandID:       editProduct.BrandID,
+		CategoryID:    editProduct.CategoryID,
+		ProductTypeID: editProduct.ProductTypeID,
+		Name:          editProduct.Name,
+		Description:   editProduct.Description,
+		Status:        editProduct.Status,
+	}
+	tx := database.DB.Begin()
+	tx, err = pc.ProductRepository.TxUpdateProduct(tx, product)
+	tx, err = pc.ProductRepository.TxUpdateItemPrices(tx, editProduct.ItemPrices)
+	tx, err = pc.ProductRepository.TxUpdateItems(tx, editProduct.Items)
+	tx, err = pc.ProductRepository.TxUpdateVariants(tx, editProduct.Variants)
+	tx, err = pc.ProductRepository.TxUpdateOptions(tx, editProduct.Options)
+	err = tx.Commit().Error
 	return nil
 }
 
@@ -181,7 +211,6 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 	files := form.File["prices_file"]
 	if err != nil {
 		fmt.Println(err)
-
 		return err
 	}
 	var theFile multipart.File
@@ -210,7 +239,7 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 		return err
 	}
 
-	pricesXLSX := []model.ItemPrice{}
+	pricesXLSX := []productModel.ItemPrice{}
 
 	rows := xlsx.GetRows("Item Prices")
 	if err != nil {
@@ -225,7 +254,7 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 			tempPriceValue, _ := strconv.ParseFloat(rows[i][4], 10)
 			pricesXLSX = append(
 				pricesXLSX,
-				model.ItemPrice{
+				productModel.ItemPrice{
 					ItemID: TempItemID,
 					Name:   rows[i][3],
 					Value:  tempPriceValue,
