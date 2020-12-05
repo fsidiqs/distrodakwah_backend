@@ -13,6 +13,6 @@ type ItemInventory struct {
 	ItemInventoryDetail *ItemInventoryDetail `gorm:"foreignKey:ItemInventoryID" json:"item_inventory_detail"`
 }
 
-// func (ItemInventory) TableName() string {
-// 	return "sp_inventory"
-// }
+type ItemInventoryXlsx struct {
+	ID uint
+}

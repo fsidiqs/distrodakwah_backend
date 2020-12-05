@@ -16,7 +16,7 @@ import (
 
 func (r *ProductRepository) FetchByColumns(req *request.FetchByColumnReq) (*Pagination, error) {
 
-	res := &Pagination{Metadata: &pagination.Metadata{}}
+	res := &Pagination{Metadata: pagination.Metadata{}}
 	products := []*prodModel.ProductResponse{}
 	query := r.DB.Model(&prodModel.ProductResponse{}).
 		Unscoped()
@@ -64,7 +64,7 @@ func (r *ProductRepository) FetchByColumns(req *request.FetchByColumnReq) (*Pagi
 
 func (r *ProductRepository) FetchAll(req *request.FetchAllReq) (*Pagination, error) {
 
-	res := &Pagination{Metadata: &pagination.Metadata{}}
+	res := &Pagination{Metadata: pagination.Metadata{}}
 	products := []*prodModel.ProductResponse{}
 	query := r.DB.Model(&prodModel.ProductResponse{}).
 		Unscoped()
@@ -109,10 +109,10 @@ func (r *ProductRepository) FetchAll(req *request.FetchAllReq) (*Pagination, err
 	return res, nil
 }
 
-func (p *Pagination) paginate(m *pagination.Metadata) {
+func (p *Pagination) paginate(m pagination.Metadata) {
 
 	page, limit, offset := pagination.BuildPagination(m)
-	p.Metadata = &pagination.Metadata{
+	p.Metadata = pagination.Metadata{
 		Total:  p.Metadata.Total,
 		Limit:  limit,
 		Offset: offset,

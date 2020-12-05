@@ -17,7 +17,7 @@ func SetInventoryGroup(g *echo.Group) {
 	inventoryController = controller.InventoryController{&inventoryRepository}
 
 	g.GET("", inventoryController.GetProductStocks)
-	g.GET("/:related_id", inventoryController.GetProductStock)
-	g.GET("/generate-import-inventory", inventoryController.GenerateExportInventoryTemplate)
+	g.GET("/:item_inventory_id", inventoryController.GetProductStock)
+	g.GET("/generate-import-inventory", inventoryController.ExportStocks)
 	g.POST("/update-stocks", inventoryController.ImportStocks)
 }

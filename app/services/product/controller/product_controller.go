@@ -38,7 +38,7 @@ func (pc *ProductController) GetProductsByColumn(c echo.Context) error {
 		Preload:  []string{},
 		PKindIDs: []int{},
 		PTypeIDs: []int{},
-		Metadata: &pagination.Metadata{
+		Metadata: pagination.Metadata{
 			Page:  pageReq,
 			Limit: limitReq,
 		},
@@ -73,7 +73,7 @@ func (pc *ProductController) Gets(c echo.Context) error {
 	request := &request.FetchAllReq{
 		Preload:      []string{},
 		ProductIDArr: []int{},
-		Metadata: &pagination.Metadata{
+		Metadata: pagination.Metadata{
 			Page:  pageReq,
 			Limit: limitReq,
 		},

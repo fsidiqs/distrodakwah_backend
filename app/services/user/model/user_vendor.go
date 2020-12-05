@@ -15,7 +15,3 @@ type UserVendor struct {
 	Address       string         `gorm:"type:text;not null" json:"address"`
 	Status        uint8          `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
 }
-
-func (UserVendor) TableName() string {
-	return "users_vendors"
-}

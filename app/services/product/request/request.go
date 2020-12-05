@@ -37,14 +37,14 @@ type SubdepartmentReq struct {
 
 type FetchAllReq struct {
 	Preload
-	Metadata     *pagination.Metadata `json:"metadata"`
-	ProductIDArr []int                `json:"product_id_arr"`
+	Metadata     pagination.Metadata `json:"metadata"`
+	ProductIDArr []int               `json:"product_id_arr"`
 }
 
 type FetchByColumnReq struct {
 	PKindIDs []int
 	PTypeIDs []int
-	Metadata *pagination.Metadata `json:"metadata"`
+	Metadata pagination.Metadata `json:"metadata"`
 	Preload
 }
 

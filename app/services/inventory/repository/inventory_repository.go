@@ -1,170 +1,94 @@
 package repository
 
-// func (r *InventoryRepository) FetchAll(req *request.FetchAllReq) (*pagination.Pagination, error) {
-// 	var err error
-// 	var total int64
+import (
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
+	inventoryModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/request"
+	productModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
+)
 
-// 	res := &pagination.Pagination{Metadata: &pagination.Metadata{}}
+func (r *InventoryRepository) FetchAll(req request.FetchAllReq) (*pagination.Pagination, error) {
+	var err error
+	var total int64
 
-// 	// inventories := []*model.InventoryResponse{}
-// 	products := []*prodModel.ProductSimpleInfo{}
-// 	productQ := r.DB.Model(&prodModel.ProductSimpleInfo{}).Unscoped()
+	res := &pagination.Pagination{Metadata: pagination.Metadata{}}
 
-// 	if len(req.ProductIDArr) > 0 {
-// 		productQ = productQ.Where("products.id IN (?)", req.ProductIDArr)
-// 	}
-// 	// count
-// 	err = productQ.Count(&total).Error
-// 	res.Metadata.UpdateTotal(total)
-// 	res.Paginate(req.Metadata)
+	products := []*productModel.ProductSimpleInfo{}
+	productQ := r.DB.Model(&productModel.ProductSimpleInfo{}).Unscoped()
 
-// 	err = productQ.Offset(res.Metadata.Offset).
-// 		Limit(res.Metadata.Limit).
-// 		Find(&products).Error
+	if len(req.ProductIDArr) > 0 {
+		productQ = productQ.Where("products.id IN (?)", req.ProductIDArr)
+	}
+	// count
+	err = productQ.Count(&total).Error
+	if err != nil {
+		return nil, err
+	}
+	res.Metadata.UpdateTotal(total)
+	res.Paginate(req.Metadata)
 
-// 	prodIDArr := []uint64{}
-// 	for _, product := range products {
-// 		prodIDArr = append(
-// 			prodIDArr,
-// 			product.ID,
-// 		)
-// 	}
+	err = productQ.Offset(res.Metadata.Offset).
+		Limit(res.Metadata.Limit).
+		Find(&products).Error
 
-// 	// STEP singleProducts
-// 	singleProducts := []*prodModel.SingleProductStock{}
+	prodIDArr := []uint64{}
+	for _, product := range products {
+		prodIDArr = append(
+			prodIDArr,
+			product.ID,
+		)
+	}
 
-// 	err = r.DB.Model(&prodModel.SingleProductStock{}).
-// 		Where("single_products.product_id IN (?)", prodIDArr).
-// 		Preload("Product").Preload("SPInventory.SPInventoryDetail.UserVendor").
-// 		Find(&singleProducts).Error
+	// STEP singleProducts
+	items := []productModel.Item{}
 
-// 	// STEP Of variantProducts
-// 	variantProducts := []*prodModel.VariantProductStock{}
-// 	err = r.DB.Model(&prodModel.VariantProductStock{}).
-// 		Where("variant_products.product_id IN (?)", prodIDArr).
-// 		Preload("Product").Preload("VPInventory.VPInventoryDetail.UserVendor").
-// 		Find(&variantProducts).Error
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	err = r.DB.Model(&productModel.Item{}).
+		Where("product_id IN (?)", prodIDArr).
+		Preload("Product").Preload("ItemInventory.ItemInventoryDetail.UserVendor").
+		Find(&items).Error
 
-// 	inventories := []*prodModel.ProductInventoryForFetch{}
+	// STEP Of variantProducts
+	res.UpdateElements(items)
 
-// 	for _, sp := range singleProducts {
-// 		inventories = append(inventories, &prodModel.ProductInventoryForFetch{
-// 			ID:            sp.ProductID,
-// 			ProductKindID: sp.Product.ProductKindID,
-// 			Sku:           sp.Product.Sku,
-// 			SingleProduct: sp,
-// 		})
-// 	}
+	return res, nil
+}
 
-// 	for _, vp := range variantProducts {
-// 		inventories = append(inventories, &prodModel.ProductInventoryForFetch{
-// 			ID:             vp.ProductID,
-// 			ProductKindID:  vp.Product.ProductKindID,
-// 			Sku:            vp.Product.Sku,
-// 			VariantProduct: vp,
-// 		})
-// 	}
-// 	res.UpdateElements(inventories)
+func (r *InventoryRepository) ExportInventory() ([]productModel.Item, error) {
+	var err error
 
-// 	return res, nil
-// }
+	products := []*productModel.ProductSimpleInfo{}
+	err = r.DB.Model(&productModel.ProductSimpleInfo{}).Unscoped().Find(&products).Error
 
-// func (r *InventoryRepository) ExportInventory() ([]*prodModel.ProductInventory, error) {
-// 	var err error
+	prodIDArr := []uint64{}
+	for _, product := range products {
+		prodIDArr = append(prodIDArr, product.ID)
+	}
 
-// 	products := []*prodModel.ProductSimpleInfo{}
-// 	err = r.DB.Model(&prodModel.ProductSimpleInfo{}).Unscoped().Find(&products).Error
+	if err != nil {
+		return nil, err
+	}
 
-// 	prodIDArr := []uint64{}
-// 	for _, product := range products {
-// 		prodIDArr = append(prodIDArr, product.ID)
-// 	}
+	items := []productModel.Item{}
+	err = r.DB.Model(&productModel.Item{}).
+		Preload("Product").Preload("ItemInventory.ItemInventoryDetail.UserVendor").
+		Find(&items).Error
+	return items, nil
+}
 
-// 	prodSPs := []*prodModel.ProductInventory{}
-// 	err = r.DB.Model(&prodModel.ProductInventory{}).
-// 		Where("id IN (?) AND product_kind_id = ?", prodIDArr, prodModel.ProductKindSingle).
-// 		Preload("SingleProduct.SPInventory").
-// 		Find(&prodSPs).Error
+type FindReq struct {
+	ItemInventoryID uint64
+	Preload         httphelper.Preload
+}
 
-// 	prodVPs := []*prodModel.ProductInventory{}
-// 	err = r.DB.Model(&prodModel.ProductInventory{}).
-// 		Preload("VariantProducts.VPInventory").
-// 		Where("id IN (?) AND product_kind_id = ?", prodIDArr, prodModel.ProductKindVariant).
-// 		Find(&prodVPs).Error
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (ir *InventoryRepository) Find(req FindReq) (*inventoryModel.ItemInventory, error) {
+	var err error
 
-// 	returnedData := []*prodModel.ProductInventory{}
-// 	for _, prod := range prodSPs {
-// 		returnedData = append(
-// 			returnedData,
-// 			&prodModel.ProductInventory{
-// 				ID:            prod.ID,
-// 				Sku:           prod.Sku,
-// 				ProductKindID: prod.ProductKindID,
-// 				SingleProduct: prod.SingleProduct,
-// 			},
-// 		)
-// 	}
+	itemIntenvory := &inventoryModel.ItemInventory{}
 
-// 	for _, prod := range prodVPs {
-// 		returnedData = append(
-// 			returnedData,
-// 			&prodModel.ProductInventory{
-// 				ID:              prod.ID,
-// 				Sku:             prod.Sku,
-// 				ProductKindID:   prod.ProductKindID,
-// 				VariantProducts: prod.VariantProducts,
-// 			},
-// 		)
-// 	}
+	err = ir.DB.Model(&inventoryModel.ItemInventory{}).
+		Preload("ItemInventoryDetail.UserVendor").
+		First(&itemIntenvory, req.ItemInventoryID).Error
 
-// 	// STEP SORT
-// 	sort.Slice(returnedData, func(i, j int) bool {
-// 		return returnedData[i].ID < returnedData[j].ID
-// 	})
-// 	return returnedData, nil
-// }
-
-// type FindReq struct {
-// 	RelatedID     uint64
-// 	ProductKindID uint8
-// 	Preload       httphelper.Preload
-// }
-
-// func (ir *InventoryRepository) Find(req FindReq) (*invModelAux.InventoryResponse, error) {
-// 	var err error
-// 	var inv *invModelAux.InventoryResponse
-
-// 	if req.ProductKindID == prodModel.ProductKindSingle {
-// 		inv = &invModelAux.InventoryResponse{
-// 			SPInventory: &invModel.SPInventory{},
-// 		}
-// 		query := ir.DB.Model(&invModel.SPInventory{}).
-// 			Where("sp_inventory.single_product_id = ?", req.RelatedID)
-
-// 		if req.Preload != nil { // check whether slice is empty
-// 			HandlePreload(query, req.Preload, prodModel.ProductKindSingle)
-// 		}
-// 		err = query.First(&inv.SPInventory).Error
-
-// 	} else if req.ProductKindID == prodModel.ProductKindVariant {
-// 		inv = &invModelAux.InventoryResponse{
-// 			VPInventory: &invModel.VPInventory{},
-// 		}
-
-// 		query := ir.DB.Model(&invModel.VPInventory{}).
-// 			Where("vp_inventory.variant_product_id = ?", req.RelatedID)
-
-// 		if req.Preload != nil { // check whether slice is empty
-// 			HandlePreload(query, req.Preload, prodModel.ProductKindVariant)
-// 		}
-// 		err = query.First(&inv.VPInventory).Error
-// 	}
-
-// 	return inv, err
-// }
+	return itemIntenvory, err
+}

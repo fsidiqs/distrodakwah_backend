@@ -19,13 +19,13 @@ func (m *Metadata) UpdateTotal(t int64) {
 
 type Pagination struct {
 	Elements interface{} `json:"elements"`
-	Metadata *Metadata   `json:"metadata"`
+	Metadata Metadata    `json:"metadata"`
 }
 
-func (p *Pagination) Paginate(m *Metadata) {
+func (p *Pagination) Paginate(m Metadata) {
 
 	page, limit, offset := BuildPagination(m)
-	p.Metadata = &Metadata{
+	p.Metadata = Metadata{
 		Total:  p.Metadata.Total,
 		Limit:  limit,
 		Offset: offset,
@@ -39,13 +39,13 @@ func (p *Pagination) UpdateElements(e interface{}) {
 }
 
 // return page, limit, offset,
-func BuildPagination(m *Metadata) (int, int, int) {
-	page := (*m).Page
+func BuildPagination(m Metadata) (int, int, int) {
+	page := (m).Page
 	if page < 1 {
 		page = defaultPage
 	}
 
-	limit := (*m).Limit
+	limit := (m).Limit
 	if limit == 0 {
 		limit = defaultLimit
 	}

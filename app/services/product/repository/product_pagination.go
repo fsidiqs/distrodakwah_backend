@@ -10,8 +10,8 @@ const (
 )
 
 type Pagination struct {
-	Elements interface{}          `json:"elements"`
-	Metadata *pagination.Metadata `json:"metadata"`
+	Elements interface{}         `json:"elements"`
+	Metadata pagination.Metadata `json:"metadata"`
 }
 
 func (p *Pagination) UpdateElements(e interface{}) {
