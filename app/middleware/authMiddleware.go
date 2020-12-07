@@ -7,8 +7,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	jwtReq "github.com/dgrijalva/jwt-go/request"
 	"github.com/labstack/echo"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/auth"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/user/model"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/config"
 )
 
@@ -18,6 +18,7 @@ type EmailContext struct {
 }
 
 type UserMiddleware struct {
+	ID     uint64
 	Email  string
 	RoleID uint8
 }
@@ -27,25 +28,31 @@ type UserContext struct {
 	User UserMiddleware
 }
 
+func performAuthCheking(c echo.Context) (*jwt.Token, error) {
+	token, err := jwtReq.ParseFromRequestWithClaims(
+		c.Request(),
+		jwtReq.OAuth2Extractor,
+		&auth.Claim{},
+		func(t *jwt.Token) (interface{}, error) {
+			return config.JWTSECRET, nil
+		},
+	)
+	return token, err
+}
+
 func CheckAuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		token, err := jwtReq.ParseFromRequestWithClaims(
-			c.Request(),
-			jwtReq.OAuth2Extractor,
-			&model.Claim{},
-			func(t *jwt.Token) (interface{}, error) {
-				return config.JWTSECRET, nil
-			},
-		)
+		token, err := performAuthCheking(c)
 		if err != nil {
 			fmt.Printf("Failed to parse token")
-			return c.JSON(http.StatusInternalServerError, "failed to parse token")
+			return c.JSON(http.StatusInternalServerError, "unauthenticated")
 		}
 		if !token.Valid {
 			fmt.Printf("Invalid token")
 			return c.JSON(http.StatusInternalServerError, "token is invalid")
 		}
-		emailContext := &EmailContext{Context: c, Email: token.Claims.(*model.Claim).User.Email}
+
+		emailContext := &EmailContext{Context: c, Email: token.Claims.(*auth.Claim).User.Email}
 
 		return next(emailContext)
 	}
@@ -58,10 +65,22 @@ const (
 
 func AdminRoleMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// emailContext := c.(*EmailContext)
 
-		emailContext := c.(*EmailContext)
+		token, err := performAuthCheking(c)
+		if err != nil {
+			fmt.Printf("Failed to parse token")
+			return c.JSON(http.StatusInternalServerError, "unauthenticated")
+		}
+		if !token.Valid {
+			fmt.Printf("Invalid token")
+			return c.JSON(http.StatusInternalServerError, "token is invalid")
+		}
+
+		emailContext := &EmailContext{Context: c, Email: token.Claims.(*auth.Claim).User.Email}
+
 		userContext := &UserContext{Context: c, User: UserMiddleware{}}
-		err := database.DB.Model(&model.User{}).Where("email = ?", emailContext.Email).Find(&userContext.User).Error
+		err = database.DB.Model(&model.User{}).Where("email = ?", emailContext.Email).Find(&userContext.User).Error
 		if err != nil {
 			return err
 		}

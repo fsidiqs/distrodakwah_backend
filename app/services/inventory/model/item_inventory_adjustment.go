@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type ItemInventoryAdjusment struct {
+type ItemInventoryAdjustment struct {
 	ID              uint64    `gorm:"primaryKey;autoIncrement;not null"`
 	ItemInventoryID uint64    `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"item_inventory_id"`
 	UserID          uint64    `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"user_id"`

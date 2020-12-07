@@ -1,5 +1,50 @@
 package repository
 
+import (
+	inventoryLibrary "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/library"
+	inventoryModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
+)
+
+func (r *InventoryRepository) PerformInventoryUpdate(itemInventoryArr []inventoryLibrary.ItemInventoryXlsx, userID uint64) error {
+	var err error
+	tx := r.DB.Begin()
+	for _, itemInventory := range itemInventoryArr {
+
+		// save previous stock to a variable
+		itemBefore := inventoryModel.ItemInventory{}
+		err = tx.Model(&inventoryModel.ItemInventory{}).
+			First(&itemBefore, itemInventory.ID).Error
+		if err != nil {
+
+			tx.Rollback()
+			return err
+		}
+
+		// create inventoryadjustment
+		err = tx.Model(&inventoryModel.ItemInventoryAdjustment{}).
+			Create(&inventoryModel.ItemInventoryAdjustment{
+				UserID:          userID,
+				ItemInventoryID: itemInventory.ID,
+				StockBefore:     itemBefore.Stock,
+				StockAfter:      itemInventory.Stock,
+			}).Error
+		if err != nil {
+
+			tx.Rollback()
+			return err
+		}
+		// update ItemInventory Stock
+		err = tx.Model(&inventoryModel.ItemInventory{}).
+			Where("id = ?", itemInventory.ID).
+			Updates(map[string]interface{}{"stock": itemInventory.Stock}).Error
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit().Error
+}
+
 // func (r *InventoryRepository) PerformStockAdjustment(stocksTempl []*invModelAux.ExcelStockFormat) error {
 // 	var err error
 // 	// STEP make single_product_inventory_adjustment
@@ -46,7 +91,7 @@ package repository
 // 	for _, stock := range stocksTempl {
 // 		if stock.ProductKindID == prodModel.ProductKindSingle && spInventoriesLen > 0 {
 // 			// STEP find single product inventory DB by current StockRelatedProductID
-// 			spIndex, ok := spInvFindByID(spInventories, stock.RelatedProductID)
+// spIndex, ok := spInvFindByID(spInventories, stock.RelatedProductID)
 // 			theBeforeStock := 0
 // 			if ok {
 // 				theBeforeStock = spInventories[spIndex].Stock
@@ -60,17 +105,17 @@ package repository
 // 					StockAfter:    stock.Stock,
 // 				},
 // 			)
-// 			// STEP updating stock
-// 			// spInventory := &invModel.SPInventory{
-// 			// 	ID:              spInventories[singleProductID].ID, // qwa
-// 			// 	SingleProductID: stock.RelatedProductID,
-// 			// 	Stock:           stock.Stock,
-// 			// }
-// 			// create if not exists or update if conflict, conflict created by //qwa above
-// 			// err = tx.Model(&invModel.SPInventory{}).Clauses(clause.OnConflict{
-// 			// 	Columns:   []clause.Column{{Name: "ID"}},
-// 			// 	DoUpdates: clause.Assignments(map[string]interface{}{"stock": stock.Stock}),
-// 			// }).Create(&spInventory).Error
+//STEP updating stock
+// spInventory := &invModel.SPInventory{
+// 	ID:              spInventories[singleProductID].ID, // qwa
+// 	SingleProductID: stock.RelatedProductID,
+// 	Stock:           stock.Stock,
+// }
+// create if not exists or update if conflict, conflict created by //qwa above
+// err = tx.Model(&invModel.SPInventory{}).Clauses(clause.OnConflict{
+// 	Columns:   []clause.Column{{Name: "ID"}},
+// 	DoUpdates: clause.Assignments(map[string]interface{}{"stock": stock.Stock}),
+// }).Create(&spInventory).Error
 // 			err = tx.Model(&invModel.SPInventory{}).Where("single_product_id = ?", stock.RelatedProductID).Update("stock", stock.Stock).Error
 // 		} else if stock.ProductKindID == prodModel.ProductKindVariant && vpInventoriesLen > 0 {
 

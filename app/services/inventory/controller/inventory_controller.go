@@ -14,6 +14,8 @@ import (
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/excelizelib"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/middleware"
+	inventoryLibrary "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/library"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/repository"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/request"
 )
@@ -108,6 +110,7 @@ func (ic *InventoryController) ExportStocks(c echo.Context) error {
 }
 
 func (ic *InventoryController) ImportStocks(c echo.Context) error {
+	userContext := c.(*middleware.UserContext)
 	form, err := c.MultipartForm()
 	files := form.File["stocks_file"]
 	if err != nil {
@@ -123,6 +126,7 @@ func (ic *InventoryController) ImportStocks(c echo.Context) error {
 		src, err := file.Open()
 
 		if err != nil {
+
 			return err
 		}
 		defer src.Close()
@@ -142,33 +146,31 @@ func (ic *InventoryController) ImportStocks(c echo.Context) error {
 		return err
 	}
 
-	stockTempl := []*aux.ExcelStockFormat{}
+	stockTempl := []inventoryLibrary.ItemInventoryXlsx{}
 	rows := xlsx.GetRows(excelizelib.Sheetname)
 	if err != nil {
 		return err
 	}
-
 	rowsLen := len(rows)
 
 	if rowsLen > 0 {
 		for currRow := excelizelib.RowReadStart; currRow < rowsLen; currRow++ {
-			tempProdKindID, _ := strconv.ParseUint(rows[currRow][0], 10, 8)
 
-			tempRelProdID, _ := strconv.ParseUint(rows[currRow][1], 10, 64)
-			tempStock, _ := strconv.ParseInt(rows[currRow][3], 10, 32)
-			tempKeep, _ := strconv.ParseInt(rows[currRow][4], 10, 32)
+			ID, _ := strconv.ParseUint(rows[currRow][0], 10, 64)
+			stock, _ := strconv.ParseInt(rows[currRow][5], 10, 32)
+			keep, _ := strconv.ParseInt(rows[currRow][6], 10, 32)
 
 			stockTempl = append(
 				stockTempl,
-				&aux.ExcelStockFormat{
-					ProductKindID:    uint8(tempProdKindID),
-					RelatedProductID: tempRelProdID,
-					Stock:            int(tempStock),
-					Keep:             int(tempKeep),
+				inventoryLibrary.ItemInventoryXlsx{
+					ID:    uint64(ID),
+					Stock: int(stock),
+					Keep:  int(keep),
 				},
 			)
 		}
 	}
 
-	err = ic.InventoryRepository.PerformStockAdjustment(stockTempl)
+	err = ic.InventoryRepository.PerformInventoryUpdate(stockTempl, userContext.User.ID)
+	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }

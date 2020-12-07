@@ -28,8 +28,9 @@ func productAuthGroup(g *echo.Group) {
 }
 
 func SetProductGroup(g *echo.Group) {
+	authGroup := g.Group("", middleware.AdminRoleMiddleware)
 
-	authGroup := g.Group("", middleware.CheckAuthMiddleware, middleware.AdminRoleMiddleware)
+	// authGroup := g.Group("", middleware.CheckAuthMiddleware, middleware.AdminRoleMiddleware)
 	productAuthGroup(authGroup)
 
 	g.GET("/generate-price-template", productController.GeneratePriceTemplate)

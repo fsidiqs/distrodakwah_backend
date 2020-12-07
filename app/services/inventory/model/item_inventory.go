@@ -12,7 +12,3 @@ type ItemInventory struct {
 	Keep                int                  `gorm:"type:INT;NOT NULL" json:"keep"`
 	ItemInventoryDetail *ItemInventoryDetail `gorm:"foreignKey:ItemInventoryID" json:"item_inventory_detail"`
 }
-
-type ItemInventoryXlsx struct {
-	ID uint
-}

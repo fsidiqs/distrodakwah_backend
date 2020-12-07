@@ -4,10 +4,18 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/user/model"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/config"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type CredUser struct {
+	Email string
+}
+
+type LoginCredetials struct {
+	Email    string
+	Password string
+}
 
 // Hash make a password hash
 func Hash(password string) ([]byte, error) {
@@ -19,8 +27,8 @@ func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func GenerateJWT(user *model.CredUser) (string, error) {
-	claim := model.Claim{
+func GenerateJWT(user *CredUser) (string, error) {
+	claim := Claim{
 		User: user,
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    "distrodakwah.id",
