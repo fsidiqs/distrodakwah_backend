@@ -6,13 +6,13 @@ import (
 	"fmt"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
-	productModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
 )
 
 var Sheetname = "inventory"
 var RowReadStart = 1
 
-func PopulateXLSX(data []productModel.Item) (*bytes.Buffer, error) {
+func PopulateXLSX(data []productmodel.Item) (*bytes.Buffer, error) {
 	xlsx := excelize.NewFile()
 
 	xlsx.NewSheet(Sheetname)

@@ -4,19 +4,17 @@ import (
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/middleware"
-
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/controller"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/repository"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/controller/productcontroller"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/productrepository"
 )
 
 var (
-	productRepository repository.ProductRepository
-	productController controller.ProductController
+	productController productcontroller.ProductController
 )
 
 func Init() {
-	productRepository = repository.ProductRepository{database.DB}
-	productController = controller.ProductController{&productRepository}
+	productRepository := productrepository.ProductRepository{database.DB}
+	productController = productcontroller.ProductController{&productRepository}
 }
 
 func productAuthGroup(g *echo.Group) {

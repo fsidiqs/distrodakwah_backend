@@ -16,9 +16,11 @@ func Init() *echo.Echo {
 	}))
 
 	// productGroup.Use(appMid.CheckAuthMiddleware, appMid.AdminRoleMiddleware)
-	InitAuthRoute()
 	authGroup := e.Group("/auth")
 	AuthGroup(authGroup)
+
+	userGroup := e.Group("/users")
+	SetUserGroup(userGroup)
 
 	productGroup := e.Group("/products")
 	product.SetProductGroup(productGroup)

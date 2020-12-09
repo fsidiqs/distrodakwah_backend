@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/auth"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/usermodel"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/config"
 )
 
@@ -80,7 +81,7 @@ func AdminRoleMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		emailContext := &EmailContext{Context: c, Email: token.Claims.(*auth.Claim).User.Email}
 
 		userContext := &UserContext{Context: c, User: UserMiddleware{}}
-		err = database.DB.Model(&model.User{}).Where("email = ?", emailContext.Email).Find(&userContext.User).Error
+		err = database.DB.Model(&usermodel.User{}).Where("email = ?", emailContext.Email).Find(&userContext.User).Error
 		if err != nil {
 			return err
 		}

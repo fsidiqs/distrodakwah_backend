@@ -12,15 +12,16 @@ var (
 	userController usercontroller.Controller
 )
 
-func adminRoleGroup(g *echo.Group) {
-	g.POST("/update-stocks", userController.CreateUser)
+func userAdminRole(g *echo.Group) {
+	g.POST("", userController.CreateUser)
+	g.POST("/create-user-reseller", userController.CreateUserReseller)
 }
 
 func SetUserGroup(g *echo.Group) {
 	userRepository := userrepository.Repository{database.DB}
-	userController = controller.UserController{&userRepository}
+	userController = usercontroller.Controller{&userRepository}
 
-	adminRole := g.Group("", ddMiddleware.AdminRoleMiddleware)
-	adminRoleGroup(adminRole)
+	adminRoleMiddleware := g.Group("", ddMiddleware.AdminRoleMiddleware)
+	userAdminRole(adminRoleMiddleware)
 
 }

@@ -1,38 +1,48 @@
 package userclass
 
 import (
-	"fmt"
+	"encoding/json"
 	"strings"
 	"time"
 )
 
-type UserBirthDate struct {
-	time.Time
-}
+type Birthdate time.Time
 
 const (
-	UserBirthDateLayout = "1900-13-12 00:00:00"
+	layoutISO = "2006-01-02"
 )
 
 var nilTime = (time.Time{}).UnixNano()
 
-func (ubd *UserBirthDate) UnmarsahlJSON(b []byte) (err error) {
+func (birthdate *Birthdate) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), "\"")
-	if s == "null" {
-		ubd.Time = time.Time{}
-		return
+	t, err := time.Parse(layoutISO, s)
+	if err != nil {
+		return err
 	}
-	ubd.Time, err = time.Parse(UserBirthDateLayout, s)
-	return
+	*birthdate = Birthdate(t)
+	return nil
 }
 
-func (ubd *UserBirthDate) MarshalJSON() ([]byte, error) {
-	if ubd.Time.UnixNano() == nilTime {
-		return []byte("null"), nil
-	}
-	return []byte(fmt.Sprintf("\"%s\"", ubd.Time.Format(UserBirthDateLayout))), nil
+func (birthdate Birthdate) MarshalJSON() ([]byte, error) {
+	return json.Marshal(birthdate)
 }
 
-func (ubd *UserBirthDate) IsSet() bool {
-	return ubd.UnixNano() != nilTime
+// func (birthdate *Birthdate) MarshalJSON() ([]byte, error) {
+// 	return []byte(fmt.Sprintf("\"%s\"", ubd.Time.Format(BirthdateLayout))), nil
+// }
+
+func (bd Birthdate) IsSet() bool {
+	t := time.Time(bd)
+	return t.UnixNano() != nilTime
 }
+
+func (bd Birthdate) Format() string {
+	t := time.Time(bd)
+	return t.Format(time.RFC3339)
+}
+
+// func (bd Birthdate) retur() time.Time {
+// 	t := time.Time(bd)
+// 	return t.Format(layoutISO)
+// }

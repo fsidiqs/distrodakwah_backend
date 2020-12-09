@@ -6,20 +6,21 @@ import (
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/middleware"
-
-var (
-	authController user.
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/controller/authcontroller"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/authrepository"
 )
 
-func InitAuthRoute() {
-	authRepository := repository.UserRepository{database.DB}
-	userController = controller.{&authRepository}
-}
+var (
+	authController authcontroller.Controller
+)
 
 // func SetAuthMiddlewares(g *echo.Group)
 
 func AuthGroup(g *echo.Group) {
-	g.POST("/login", userController.Login)
+	authRepository := authrepository.Repository{database.DB}
+	authController = authcontroller.Controller{&authRepository}
+
+	g.POST("/login", authController.Login)
 
 	g.GET("", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, "ok")
