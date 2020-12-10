@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"distrodakwah_backend/app/helper/httphelper"
+	"distrodakwah_backend/app/services/handler/userhandler"
+	"distrodakwah_backend/app/services/model/usermodel"
+	"distrodakwah_backend/app/services/repository/userrepository"
+
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/userhandler"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/usermodel"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/userrepository"
 )
 
 type Controller struct {

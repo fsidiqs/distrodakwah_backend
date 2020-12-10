@@ -5,10 +5,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/router"
-	product "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/router/product"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/config"
+	"distrodakwah_backend/app/database"
+	"distrodakwah_backend/app/router"
+	product "distrodakwah_backend/app/router/product"
+	"distrodakwah_backend/config"
 )
 
 func init() {

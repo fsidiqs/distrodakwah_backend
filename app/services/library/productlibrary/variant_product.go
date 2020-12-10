@@ -1,6 +1,6 @@
 package productlibrary
 
-import "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
+import "distrodakwah_backend/app/services/model/productmodel"
 
 type ProductDetailVariant struct {
 	Details  []VariantProduct

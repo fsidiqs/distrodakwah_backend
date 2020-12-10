@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"net/http"
 
+	"distrodakwah_backend/app/auth"
+	"distrodakwah_backend/app/database"
+	"distrodakwah_backend/app/services/model/usermodel"
+	"distrodakwah_backend/config"
+
 	"github.com/dgrijalva/jwt-go"
 	jwtReq "github.com/dgrijalva/jwt-go/request"
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/auth"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/usermodel"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/config"
 )
 
 type EmailContext struct {

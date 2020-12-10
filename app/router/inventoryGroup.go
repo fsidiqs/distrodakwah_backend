@@ -1,11 +1,12 @@
 package router
 
 import (
+	"distrodakwah_backend/app/database"
+	ddMiddleware "distrodakwah_backend/app/middleware"
+	"distrodakwah_backend/app/services/controller/inventorycontroller"
+	"distrodakwah_backend/app/services/repository/inventoryrepository"
+
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	ddMiddleware "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/middleware"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/controller/inventorycontroller"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/inventoryrepository"
 )
 
 var (

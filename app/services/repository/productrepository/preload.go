@@ -1,7 +1,8 @@
 package productrepository
 
 import (
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/producthandler"
+	"distrodakwah_backend/app/services/handler/producthandler"
+
 	"gorm.io/gorm"
 )
 

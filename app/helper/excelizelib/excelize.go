@@ -5,8 +5,9 @@ import (
 	"bytes"
 	"fmt"
 
+	"distrodakwah_backend/app/services/model/productmodel"
+
 	"github.com/360EntSecGroup-Skylar/excelize"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
 )
 
 var Sheetname = "inventory"

@@ -1,10 +1,11 @@
 package router
 
 import (
+	"distrodakwah_backend/app/database"
+	"distrodakwah_backend/app/services/controller/ordercontroller"
+	"distrodakwah_backend/app/services/repository/orderrepository"
+
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/controller/ordercontroller"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/orderrepository"
 )
 
 var (

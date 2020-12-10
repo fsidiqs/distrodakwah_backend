@@ -3,7 +3,7 @@ package userhandler
 import (
 	"errors"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/class/userclass"
+	"distrodakwah_backend/app/services/class/userclass"
 )
 
 type UserReq struct {

@@ -3,9 +3,9 @@ package orderrepository
 // import (
 // 	"time"
 
-// 	invModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
-// 	orderModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/order/model"
-// 	prodModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
+// 	invModel "distrodakwah_backend/app/services/inventory/model"
+// 	orderModel "distrodakwah_backend/app/services/order/model"
+// 	prodModel "distrodakwah_backend/app/services/product/model"
 // )
 
 // func (r *OrderRepository) SaveOrder(orderReq *orderModel.OrderReq) error {

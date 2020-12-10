@@ -3,9 +3,10 @@ package productcontroller
 import (
 	"net/http"
 
+	"distrodakwah_backend/app/helper/httphelper"
+	"distrodakwah_backend/app/services/handler/producthandler"
+
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/producthandler"
 )
 
 func (pc *ProductController) GetCategories(c echo.Context) error {

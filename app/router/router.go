@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
-	product "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/router/product"
+	product "distrodakwah_backend/app/router/product"
 )
 
 func Init() *echo.Echo {

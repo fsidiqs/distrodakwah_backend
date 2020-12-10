@@ -1,6 +1,6 @@
 package productrepository
 
-import "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
+import "distrodakwah_backend/app/services/model/productmodel"
 
 func (r *ProductRepository) FetchAllKind() ([]*productmodel.ProductKind, error) {
 	productKinds := []*productmodel.ProductKind{}

@@ -1,6 +1,6 @@
 package productmodel
 
-import "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/inventorymodel"
+import "distrodakwah_backend/app/services/model/inventorymodel"
 
 type Item struct {
 	ID            uint64                        `gorm:"primaryKey;autoIncrement;not null"`

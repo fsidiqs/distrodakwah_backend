@@ -4,8 +4,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/auth"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/userhandler"
+	"distrodakwah_backend/app/auth"
+	"distrodakwah_backend/app/services/handler/userhandler"
+
 	"gorm.io/gorm"
 )
 

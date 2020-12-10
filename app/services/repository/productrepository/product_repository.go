@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/producthandler"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/inventorymodel"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
+	"distrodakwah_backend/app/database"
+	"distrodakwah_backend/app/helper/pagination"
+	"distrodakwah_backend/app/services/handler/producthandler"
+	"distrodakwah_backend/app/services/model/inventorymodel"
+	"distrodakwah_backend/app/services/model/productmodel"
+
 	"gorm.io/gorm"
 )
 

@@ -1,6 +1,6 @@
 package inventorymodel
 
-import "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/usermodel"
+import "distrodakwah_backend/app/services/model/usermodel"
 
 type ItemInventoryDetail struct {
 	ID              uint64                `gorm:"primaryKey;autoIncrement;not null"`

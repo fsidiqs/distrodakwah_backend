@@ -11,15 +11,16 @@ import (
 	"strings"
 	"time"
 
+	"distrodakwah_backend/app/database"
+	"distrodakwah_backend/app/helper/httphelper"
+	"distrodakwah_backend/app/helper/pagination"
+	"distrodakwah_backend/app/services/handler/producthandler"
+	"distrodakwah_backend/app/services/library/productlibrary"
+	"distrodakwah_backend/app/services/model/productmodel"
+	"distrodakwah_backend/app/services/repository/productrepository"
+
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/producthandler"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/library/productlibrary"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/productrepository"
 
 	"gorm.io/gorm"
 )

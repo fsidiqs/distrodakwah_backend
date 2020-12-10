@@ -3,8 +3,9 @@ package productrepository
 import (
 	"fmt"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel/productauxmodel"
+	"distrodakwah_backend/app/services/model/productmodel"
+	"distrodakwah_backend/app/services/model/productmodel/productauxmodel"
+
 	"gorm.io/gorm"
 )
 

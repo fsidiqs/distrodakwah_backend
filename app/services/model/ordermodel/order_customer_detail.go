@@ -3,8 +3,8 @@ package ordermodel
 import (
 	"errors"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	custModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/user/model"
+	"distrodakwah_backend/app/database"
+	custModel "distrodakwah_backend/app/services/user/model"
 )
 
 type OrderCustomer struct {

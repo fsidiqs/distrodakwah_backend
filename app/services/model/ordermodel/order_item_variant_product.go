@@ -1,10 +1,10 @@
 package ordermodel
 
 import (
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/sliceutils"
-	invModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/inventory/model"
-	prodModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/model"
+	"distrodakwah_backend/app/database"
+	"distrodakwah_backend/app/helper/sliceutils"
+	invModel "distrodakwah_backend/app/services/inventory/model"
+	prodModel "distrodakwah_backend/app/services/product/model"
 )
 
 type OrderItemVariantProduct struct {

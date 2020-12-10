@@ -1,8 +1,8 @@
 package productrepository
 
 import (
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/producthandler"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
+	"distrodakwah_backend/app/services/handler/producthandler"
+	"distrodakwah_backend/app/services/model/productmodel"
 )
 
 func (r *ProductRepository) FetchAllCategory() ([]*productmodel.Category, error) {

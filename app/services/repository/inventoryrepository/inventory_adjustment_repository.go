@@ -1,8 +1,8 @@
 package inventoryrepository
 
 import (
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/library/inventorylibrary"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/inventorymodel"
+	"distrodakwah_backend/app/services/library/inventorylibrary"
+	"distrodakwah_backend/app/services/model/inventorymodel"
 )
 
 func (r *InventoryRepository) PerformInventoryUpdate(itemInventoryArr []inventorylibrary.ItemInventoryXlsx, userID uint64) error {

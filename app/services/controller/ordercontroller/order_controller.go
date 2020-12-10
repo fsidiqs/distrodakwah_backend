@@ -1,8 +1,9 @@
 package ordercontroller
 
 import (
+	"distrodakwah_backend/app/services/repository/orderrepository"
+
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/orderrepository"
 )
 
 // import (
@@ -11,9 +12,9 @@ import (
 // 	"time"
 
 // 	"github.com/labstack/echo"
-// 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
-// 	orderModel "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/order/model"
-// 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/order/repository"
+// 	"distrodakwah_backend/app/helper/httphelper"
+// 	orderModel "distrodakwah_backend/app/services/order/model"
+// 	"distrodakwah_backend/app/services/order/repository"
 // )
 
 type OrderController struct {

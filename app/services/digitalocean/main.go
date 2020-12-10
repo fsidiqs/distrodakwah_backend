@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
-	productClass "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/product/class"
+	productClass "distrodakwah_backend/app/services/product/class"
 )
 
 var (

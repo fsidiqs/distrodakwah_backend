@@ -1,11 +1,11 @@
 package inventoryrepository
 
 import (
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/inventoryhandler"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/inventorymodel"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
+	"distrodakwah_backend/app/helper/httphelper"
+	"distrodakwah_backend/app/helper/pagination"
+	"distrodakwah_backend/app/services/handler/inventoryhandler"
+	"distrodakwah_backend/app/services/model/inventorymodel"
+	"distrodakwah_backend/app/services/model/productmodel"
 )
 
 func (r *InventoryRepository) FetchAll(req inventoryhandler.FetchAllReq) (*pagination.Pagination, error) {

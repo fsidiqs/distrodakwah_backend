@@ -1,11 +1,12 @@
 package api
 
 import (
+	"distrodakwah_backend/app/database"
+	"distrodakwah_backend/app/middleware"
+	"distrodakwah_backend/app/services/controller/productcontroller"
+	"distrodakwah_backend/app/services/repository/productrepository"
+
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/middleware"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/controller/productcontroller"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/productrepository"
 )
 
 var (

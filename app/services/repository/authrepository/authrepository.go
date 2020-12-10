@@ -1,6 +1,6 @@
 package authrepository
 
-import "github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/usermodel"
+import "distrodakwah_backend/app/services/model/usermodel"
 
 func (r *Repository) GetUserByEmail(email string) (*usermodel.User, error) {
 	user := &usermodel.User{}

@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
+	"distrodakwah_backend/app/helper/pagination"
 )
 
 type Preload []string

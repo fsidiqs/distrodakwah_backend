@@ -3,7 +3,7 @@ package ordermodel
 import (
 	"errors"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/sliceutils"
+	"distrodakwah_backend/app/helper/sliceutils"
 )
 
 type OrderShipping struct {

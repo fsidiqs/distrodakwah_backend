@@ -3,7 +3,7 @@ package producthandler
 import (
 	"errors"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/productmodel"
+	"distrodakwah_backend/app/services/model/productmodel"
 )
 
 const RetailPriceName = "retail"

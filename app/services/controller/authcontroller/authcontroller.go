@@ -4,11 +4,12 @@ import (
 	"log"
 	"net/http"
 
+	"distrodakwah_backend/app/auth"
+	"distrodakwah_backend/app/helper/httphelper"
+	"distrodakwah_backend/app/services/model/usermodel"
+	"distrodakwah_backend/app/services/repository/authrepository"
+
 	"github.com/labstack/echo"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/auth"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/model/usermodel"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/authrepository"
 )
 
 type Controller struct {

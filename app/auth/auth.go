@@ -3,8 +3,9 @@ package auth
 import (
 	"time"
 
+	"distrodakwah_backend/config"
+
 	"github.com/dgrijalva/jwt-go"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/config"
 	"golang.org/x/crypto/bcrypt"
 )
 

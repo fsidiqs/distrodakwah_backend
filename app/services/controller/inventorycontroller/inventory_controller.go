@@ -11,13 +11,13 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/labstack/echo"
 
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/excelizelib"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/httphelper"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/helper/pagination"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/middleware"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/handler/inventoryhandler"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/library/inventorylibrary"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/inventoryrepository"
+	"distrodakwah_backend/app/helper/excelizelib"
+	"distrodakwah_backend/app/helper/httphelper"
+	"distrodakwah_backend/app/helper/pagination"
+	"distrodakwah_backend/app/middleware"
+	"distrodakwah_backend/app/services/handler/inventoryhandler"
+	"distrodakwah_backend/app/services/library/inventorylibrary"
+	"distrodakwah_backend/app/services/repository/inventoryrepository"
 )
 
 type InventoryController struct {
