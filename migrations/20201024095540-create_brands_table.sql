@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `brands` (
     `updated_at` TIMESTAMP NULL,
     `deleted_at` TIMESTAMP NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT brands_user_vendor_id foreign key(user_vendor_id) references users_vendors(id),
+    CONSTRAINT brands_user_vendor_id foreign key(user_vendor_id) references user_vendors(id),
     CONSTRAINT brands_image_id foreign key(image_id) references images(id)
 ) ENGINE = InnoDB;
 

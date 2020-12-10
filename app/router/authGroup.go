@@ -1,34 +1,28 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/database"
 	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/middleware"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/user/controller"
-	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/user/repository"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/controller/authcontroller"
+	"github.com/zakiyfadhilmuhsin/distrodakwah_backend/app/services/repository/authrepository"
 )
 
 var (
-	userRepository repository.UserRepository
-	userController controller.UserController
+	authController authcontroller.Controller
 )
-
-func InitAuthRoute() {
-	userRepository = repository.UserRepository{database.DB}
-	userController = controller.UserController{&userRepository}
-}
 
 // func SetAuthMiddlewares(g *echo.Group)
 
 func AuthGroup(g *echo.Group) {
-	g.POST("/login", userController.Login)
+	authRepository := authrepository.Repository{database.DB}
+	authController = authcontroller.Controller{&authRepository}
+
+	g.POST("/login", authController.Login)
 
 	g.GET("", func(c echo.Context) error {
-		fmt.Println("test ", c.(*middleware.UserContext))
-
 		return c.JSON(http.StatusOK, "ok")
 	}, middleware.CheckAuthMiddleware, middleware.AdminRoleMiddleware)
 }

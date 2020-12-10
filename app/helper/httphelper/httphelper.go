@@ -11,3 +11,5 @@ const (
 	InternalServerErrorMessage = "internal_server_error"
 	StatusOKMessage            = "success"
 )
+
+type Preload []string
