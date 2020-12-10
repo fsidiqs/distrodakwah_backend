@@ -190,6 +190,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 			v.ProductID = productRes.ID
 		}
 		err = tx.Model(&productmodel.Variant{}).Create(&variantCreateReqs).Error
+
 		if err != nil {
 			fmt.Println("product creating variants")
 			return err
@@ -244,7 +245,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 	err = tx.Model(&productmodel.Item{}).Create(&items).Error
 
 	if err != nil {
-		fmt.Printf("Error Creating Single Product \n %+v \n", err)
+		fmt.Printf("Error Creating Product \n %+v \n", err)
 		tx.Rollback()
 		return err
 	}

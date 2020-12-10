@@ -25,9 +25,9 @@ func (r *Repository) CreateUser(user usermodel.User) (*usermodel.User, error) {
 	return &user, nil
 }
 
-func (r *Repository) CreateUserReseller(userReseller usermodel.UserHasOneReseller) (*usermodel.UserHasOneReseller, error) {
+func (r *Repository) CreateUserReseller(userReseller usermodel.UserWithChild) (*usermodel.UserWithChild, error) {
 	var err error
-	err = r.DB.Model(&usermodel.UserHasOneReseller{}).Create(&userReseller).Error
+	err = r.DB.Model(&usermodel.UserWithChild{}).Create(&userReseller).Error
 	if err != nil {
 		return nil, err
 	}

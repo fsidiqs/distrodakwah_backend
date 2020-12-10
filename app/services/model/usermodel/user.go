@@ -60,7 +60,7 @@ func (u User) Validate() error {
 	return nil
 }
 
-type UserHasOneReseller struct {
+type UserWithChild struct {
 	ID           uint64         `gorm:"primaryKey;autoIncrement;not null"`
 	CreatedAt    time.Time      `json:"created_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
@@ -72,8 +72,9 @@ type UserHasOneReseller struct {
 	Password     string         `gorm:"type:varchar(255);not null" json:"password"`
 	RoleID       uint8          `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"role_id"`
 	UserReseller UserReseller   `gorm:"foreignKey:UserID" json:"user_reseller"`
+	UserVendor   UserVendor     `gorm:"foreignKey:UserID" json:"user_vendor"`
 }
 
-func (UserHasOneReseller) TableName() string {
+func (UserWithChild) TableName() string {
 	return "users"
 }

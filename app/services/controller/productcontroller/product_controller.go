@@ -167,7 +167,6 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 		fmt.Printf("error creating product: %+v", err)
 		return c.JSON(http.StatusInternalServerError, httphelper.InternalServerErrorMessage)
 	}
-	fmt.Println("asd")
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }
 

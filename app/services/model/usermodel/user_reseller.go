@@ -23,7 +23,7 @@ type UserReseller struct {
 	Status         uint8          `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
 }
 
-func NewUserReseller(userResellerReq userhandler.UserResellerReq) (*UserHasOneReseller, error) {
+func NewUserReseller(userResellerReq userhandler.UserResellerReq) (*UserWithChild, error) {
 	var err error
 
 	// validate
@@ -32,7 +32,7 @@ func NewUserReseller(userResellerReq userhandler.UserResellerReq) (*UserHasOneRe
 		return nil, errors.New(HashingPasswordErr)
 	}
 
-	userReseller := UserHasOneReseller{
+	userReseller := UserWithChild{
 		Gender:    userResellerReq.Gender,
 		Name:      userResellerReq.Name,
 		Email:     userResellerReq.Email,
