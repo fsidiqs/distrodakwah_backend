@@ -34,8 +34,7 @@ type UserResellerReq struct {
 	Phone          string              `gorm:"type:varchar(255);not null" json:"phone"`
 	Password       string              `gorm:"type:varchar(255);not null" json:"password"`
 	ResellerRoleID uint8               `gorm:"NOT NULL" json:"reseller_role_id"`
-	LocationType   string              `json:"location_type"`
-	LocationID     int                 `json:"location_id"`
+	SubdistrictID  int                 `json:"subdistrict_id"`
 	Address        string              `gorm:"type:text" json:"address"`
 	PostalCode     string              `json:"postal_code"`
 	Gender         string              `gorm:"type:enum;UNSIGNED;NOT NULL" json:"gender"`

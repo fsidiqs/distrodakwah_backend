@@ -1,9 +1,10 @@
 -- +migrate Up
 CREATE TABLE IF NOT EXISTS `orders` (
     `id` BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    `invoice` STRING NOT NULL,
+    `invoice` VARCHAR(255) NOT NULL,
     `order_status_id` TINYINT UNSIGNED NOT NULL,
-    `total` BIGINT NOT NULL DEFAULT 0,
+    `total` BIGINT DEFAULT 0 NOT NULL,
+    `grand_total` BIGINT DEFAULT 0 NOT NULL,
     `unique_code` INT NOT NULL,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,

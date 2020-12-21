@@ -17,8 +17,7 @@ type UserReseller struct {
 	UpdatedAt      time.Time      `json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	ResellerRoleID uint8          `gorm:"not null" json:"reesller_role_id"`
-	LocationType   string         `json:"location_type"`
-	LocationID     int            `gorm:"type:int;not null" json:"location_id"`
+	SubdistrictID  int            `gorm:"type:int;not null" json:"subdistrict_id"`
 	Address        string         `gorm:"type:text;not null" json:"address"`
 	PostalCode     string         `json:"postal_code"`
 	Status         uint8          `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
@@ -42,8 +41,7 @@ func NewUserReseller(userResellerReq userhandler.UserResellerReq) (*UserWithChil
 		RoleID:    Reseller,
 		Birthdate: time.Time(userResellerReq.Birthdate),
 		UserReseller: UserReseller{
-			LocationType:   userResellerReq.LocationType,
-			LocationID:     userResellerReq.LocationID,
+			SubdistrictID:  userResellerReq.SubdistrictID,
 			Address:        userResellerReq.Address,
 			PostalCode:     userResellerReq.PostalCode,
 			ResellerRoleID: userResellerReq.ResellerRoleID,

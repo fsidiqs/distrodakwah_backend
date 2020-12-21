@@ -34,6 +34,9 @@ type ItemCreateBasicProduct struct {
 	Options   string  `json:"options"`
 }
 
+type ItemInventoryRequestCreateBasicProduct struct {
+}
+
 type OptionReq struct {
 	Option string `json:"option"`
 }

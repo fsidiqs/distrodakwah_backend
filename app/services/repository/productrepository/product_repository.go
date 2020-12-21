@@ -251,12 +251,23 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 		return err
 	}
 
-	brandDB := &productmodel.Brand{}
+	var itemSubdistrictID int
 
 	if productReqJSON.ProductTypeID == productmodel.ProductTypeVendor {
-		err = database.DB.Model(&productmodel.Brand{}).Where("id = ?", productReqJSON.BrandID).Find(&brandDB).Error
+		brandDB := &productmodel.Brand{}
+		err = database.DB.Model(&productmodel.Brand{}).
+			Where("id = ?", productReqJSON.BrandID).Find(&brandDB).
+			Preload("UserVendor").
+			Error
+
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		itemSubdistrictID = brandDB.UserVendor.SubdistrictID
 	} else {
-		brandDB.UserVendorID = productmodel.ProductTypeConsignment
+		itemSubdistrictID = inventorymodel.MainSubdistrict
 	}
 	// STEP ofCreating single product
 
@@ -269,7 +280,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 				Stock:  0,
 				ItemID: item.ID,
 				ItemInventoryDetail: &inventorymodel.ItemInventoryDetail{
-					VendorID: brandDB.UserVendorID,
+					SubdistrictID: itemSubdistrictID,
 				},
 			},
 		)

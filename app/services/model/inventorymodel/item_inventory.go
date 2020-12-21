@@ -1,9 +1,6 @@
 package inventorymodel
 
-var InitItemInventory = ItemInventory{
-	Stock: 0,
-	Keep:  0,
-}
+const MainSubdistrict = 1
 
 type ItemInventory struct {
 	ID                  uint64               `gorm:"primaryKey;autoIncrement;not null"`

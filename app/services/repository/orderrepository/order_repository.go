@@ -1,5 +1,11 @@
 package orderrepository
 
+import (
+	"distrodakwah_backend/app/services/handler/orderhandler"
+	"distrodakwah_backend/app/services/model/usermodel"
+	"fmt"
+)
+
 // import (
 // 	"time"
 
@@ -7,6 +13,29 @@ package orderrepository
 // 	orderModel "distrodakwah_backend/app/services/order/model"
 // 	prodModel "distrodakwah_backend/app/services/product/model"
 // )
+
+func (r *OrderRepository) SaveOrder(orderReq orderhandler.OrderReq, userID uint64) error {
+	var err error
+	tx := r.DB.Begin()
+	user := usermodel.User{}
+	err = tx.Model(&usermodel.UserReseller{}).
+		Where("user_id = ?", userID).
+		First(&user).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	fmt.Printf("%+v user")
+	// find UserReseller from userID
+
+	return nil
+	// prepare orderID -> Order
+	// order := ordermodel.Order{
+	// 	UserResellerID: 1,
+	// }
+	// create orderItems =
+}
 
 // func (r *OrderRepository) SaveOrder(orderReq *orderModel.OrderReq) error {
 // 	var err error

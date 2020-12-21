@@ -1,7 +1,11 @@
 package ordercontroller
 
 import (
+	"distrodakwah_backend/app/helper/httphelper"
+	"distrodakwah_backend/app/middleware"
+	"distrodakwah_backend/app/services/handler/orderhandler"
 	"distrodakwah_backend/app/services/repository/orderrepository"
+	"net/http"
 
 	"github.com/labstack/echo"
 )
@@ -22,6 +26,23 @@ type OrderController struct {
 }
 
 func (oc *OrderController) PostOrder(c echo.Context) error {
+	var err error
+	userContext := c.(*middleware.UserContext)
+
+	orderreq := orderhandler.OrderReq{
+		OrderItemReq: []orderhandler.OrderItemReq{
+			orderhandler.OrderItemReq{
+				ItemID: 20,
+				Qty:    5,
+			},
+		},
+		ShippingCompanyID: 1,
+		CustomerID:        1,
+	}
+	err = oc.OrderRepository.SaveOrder(orderreq, userContext.User.ID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, httphelper.InternalServerErrorMessage)
+	}
 	// 	test := &orderModel.OrderReq{
 	// 		Invoice:          "testing2",
 	// 		OrderStatusID:    1,
