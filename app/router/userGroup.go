@@ -14,8 +14,16 @@ var (
 )
 
 func userAdminRole(g *echo.Group) {
+
 	g.POST("", userController.CreateUser)
 	g.POST("/create-user-reseller", userController.CreateUserReseller)
+
+	g.GET("/vendors", userController.GetUserVendors)
+	g.GET("/resellers", userController.GetUserResellers)
+	g.GET("/user-active", userController.GetAllUser)
+
+	g.DELETE("/delete/:id", userController.DeleteUsers)
+	g.PUT("/reseller/upgrade-to-ekslusif/:id", userController.UpgradeAkunReseller)
 }
 
 func SetUserGroup(g *echo.Group) {

@@ -72,7 +72,7 @@ type UserWithChild struct {
 	Phone        string         `gorm:"type:varchar(255);not null" json:"phone"`
 	Password     string         `gorm:"type:varchar(255);not null" json:"password"`
 	RoleID       uint8          `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"role_id"`
-	UserReseller UserReseller   `gorm:"foreignKey:UserID" json:"user_reseller"`
+	UserReseller UserReseller   `gorm:"foreignKey:UserID" json:"user_reseller,omitempty"`
 	UserVendor   UserVendor     `gorm:"foreignKey:UserID" json:"user_vendor"`
 }
 
