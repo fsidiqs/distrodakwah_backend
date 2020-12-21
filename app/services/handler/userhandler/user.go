@@ -3,8 +3,11 @@ package userhandler
 import (
 	"errors"
 
+	"distrodakwah_backend/app/helper/pagination"
 	"distrodakwah_backend/app/services/class/userclass"
 )
+
+type Preload []string
 
 type UserReq struct {
 	Gender    string              `gorm:"type:enum;UNSIGNED;NOT NULL" json:"gender"`
@@ -40,4 +43,9 @@ type UserResellerReq struct {
 	PostalCode     string              `json:"postal_code"`
 	Gender         string              `gorm:"type:enum;UNSIGNED;NOT NULL" json:"gender"`
 	Birthdate      userclass.Birthdate `gorm:"type:date; column:birthdate" json:"birthdate"`
+}
+
+type FetchUsersReq struct {
+	Metadata  pagination.Metadata `json:"metadata"`
+	UserIDarr []int               `json:"user_id_arr"`
 }

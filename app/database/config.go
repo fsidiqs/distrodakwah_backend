@@ -32,7 +32,7 @@ func BuildDSN() string {
 	}
 
 	if pass == "" {
-		pass = "root"
+		pass = "Apinchocs98"
 	}
 
 	if dbname == "" {

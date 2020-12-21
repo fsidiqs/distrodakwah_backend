@@ -16,5 +16,5 @@ type UserVendor struct {
 	LocationID   int            `gorm:"type:int;not null" json:"location_id"`
 	Address      string         `gorm:"type:text;not null" json:"address"`
 	PostalCode   string         `json:"postal_code"`
-	Status       uint8          `gorm:"type:TINYINT;UNSIGNED;NOT NULL;default:0" json:"status"`
+	Status       string         `gorm:"type:VARCHAR;UNSIGNED;NOT NULL;default:A" json:"status"`
 }
