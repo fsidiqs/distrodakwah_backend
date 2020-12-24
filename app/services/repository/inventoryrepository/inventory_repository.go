@@ -71,7 +71,7 @@ func (r *InventoryRepository) ExportInventory() ([]productmodel.Item, error) {
 
 	items := []productmodel.Item{}
 	err = r.DB.Model(&productmodel.Item{}).
-		Preload("Product").Preload("ItemInventory.ItemInventoryDetail.UserVendor").
+		Preload("Product").Preload("ItemInventory.ItemInventoryDetail.Subdistrict").
 		Find(&items).Error
 	return items, nil
 }
@@ -87,7 +87,7 @@ func (ir *InventoryRepository) Find(req FindReq) (*inventorymodel.ItemInventory,
 	itemIntenvory := &inventorymodel.ItemInventory{}
 
 	err = ir.DB.Model(&inventorymodel.ItemInventory{}).
-		Preload("ItemInventoryDetail.UserVendor").
+		Preload("ItemInventoryDetail.Subdistrict").
 		First(&itemIntenvory, req.ItemInventoryID).Error
 
 	return itemIntenvory, err

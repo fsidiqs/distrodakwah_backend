@@ -10,7 +10,7 @@ func HandlePreload(query *gorm.DB, pre *producthandler.Preload) {
 	for _, value := range *pre {
 		if value == "belongs_to" {
 			query = query.Preload("ProductType").
-				Preload("Brand").
+				Preload("Brand.UserVendor").
 				Preload("Category.Subdepartment.Department").
 				Preload("ProductType").
 				Preload("ProductKind")

@@ -1,9 +1,8 @@
 -- +migrate Up
-
 CREATE TABLE IF NOT EXISTS `tb_ro_cities` (
     `id` int(11) NOT NULL,
     `province_id` int(11) DEFAULT NULL,
-    `city_name` varchar(255) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
     `postal_code` char(5) DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
@@ -12,7 +11,7 @@ INSERT INTO
     `tb_ro_cities` (
         `id`,
         `province_id`,
-        `city_name`,
+        `name`,
         `postal_code`
     )
 VALUES
@@ -623,15 +622,14 @@ VALUES
     (500, 24, "Kabupaten Yalimo", "99481"),
     (501, 5, "Kota Yogyakarta", "55222");
 
-
 CREATE TABLE IF NOT EXISTS `tb_ro_provinces` (
     `id` int(11) NOT NULL,
-    `province_name` varchar(255) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
 INSERT INTO
-    `tb_ro_provinces` (`id`, `province_name`)
+    `tb_ro_provinces` (`id`, `name`)
 VALUES
     (1, "Bali"),
     (2, "Bangka Belitung"),
@@ -668,11 +666,10 @@ VALUES
     (33, "Sumatera Selatan"),
     (34, "Sumatera Utara");
 
-
 CREATE TABLE IF NOT EXISTS `tb_ro_subdistricts` (
     `id` int(11) NOT NULL,
     `city_id` int(11) DEFAULT NULL,
-    `subdistrict_name` varchar(255) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
@@ -7696,5 +7693,7 @@ VALUES
 
 -- +migrate Down
 DROP TABLE IF EXISTS `tb_ro_cities`;
+
 DROP TABLE IF EXISTS `tb_ro_subdistricts`;
+
 DROP TABLE IF EXISTS `tb_ro_provinces`;

@@ -32,12 +32,13 @@ func BuildDSN() string {
 	}
 
 	if pass == "" {
-		pass = "Apinchocs98"
+		pass = os.Getenv("DB_PASS")
 	}
 
 	if dbname == "" {
-		dbname = "dd"
+		dbname = os.Getenv("DB_NAME")
 	}
+
 	if env != "STAGING" || env != "PRODUCTION" {
 		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 			user, pass, host, port, dbname)

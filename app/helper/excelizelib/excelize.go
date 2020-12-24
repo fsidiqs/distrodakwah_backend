@@ -24,17 +24,22 @@ func PopulateXLSX(data []productmodel.Item) (*bytes.Buffer, error) {
 	xlsx.SetCellValue(Sheetname, "E1", "SKU")
 	xlsx.SetCellValue(Sheetname, "F1", "Stock")
 	xlsx.SetCellValue(Sheetname, "G1", "Keep")
+	xlsx.SetCellValue(Sheetname, "H1", "Location")
 
 	rowNum := 2
 	for _, elem := range data {
-		xlsx.SetCellValue(Sheetname, fmt.Sprintf("A%d", rowNum), elem.ItemInventory.ID)
-		xlsx.SetCellValue(Sheetname, fmt.Sprintf("B%d", rowNum), elem.ID)
-		xlsx.SetCellValue(Sheetname, fmt.Sprintf("C%d", rowNum), elem.Product.ProductKindID)
-		xlsx.SetCellValue(Sheetname, fmt.Sprintf("D%d", rowNum), elem.ProductID)
-		xlsx.SetCellValue(Sheetname, fmt.Sprintf("E%d", rowNum), elem.Sku)
-		xlsx.SetCellValue(Sheetname, fmt.Sprintf("F%d", rowNum), elem.ItemInventory.Stock)
-		xlsx.SetCellValue(Sheetname, fmt.Sprintf("G%d", rowNum), elem.ItemInventory.Keep)
-		rowNum++
+		for _, itemInventory := range elem.ItemInventory {
+			fmt.Printf("inventory :%+v\n", itemInventory.ItemInventoryDetail.Subdistrict)
+			xlsx.SetCellValue(Sheetname, fmt.Sprintf("A%d", rowNum), itemInventory.ID)
+			xlsx.SetCellValue(Sheetname, fmt.Sprintf("B%d", rowNum), elem.ID)
+			xlsx.SetCellValue(Sheetname, fmt.Sprintf("C%d", rowNum), elem.Product.ProductKindID)
+			xlsx.SetCellValue(Sheetname, fmt.Sprintf("D%d", rowNum), elem.ProductID)
+			xlsx.SetCellValue(Sheetname, fmt.Sprintf("E%d", rowNum), elem.Sku)
+			xlsx.SetCellValue(Sheetname, fmt.Sprintf("F%d", rowNum), itemInventory.Stock)
+			xlsx.SetCellValue(Sheetname, fmt.Sprintf("G%d", rowNum), itemInventory.Keep)
+			xlsx.SetCellValue(Sheetname, fmt.Sprintf("H%d", rowNum), itemInventory.ItemInventoryDetail.Subdistrict.Name)
+			rowNum++
+		}
 	}
 
 	var b bytes.Buffer
@@ -44,4 +49,6 @@ func PopulateXLSX(data []productmodel.Item) (*bytes.Buffer, error) {
 		return nil, err
 	}
 	return &b, nil
+
+	return nil, nil
 }

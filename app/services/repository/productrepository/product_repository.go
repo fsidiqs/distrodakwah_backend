@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"distrodakwah_backend/app/database"
 	"distrodakwah_backend/app/helper/pagination"
 	"distrodakwah_backend/app/services/handler/producthandler"
 	"distrodakwah_backend/app/services/model/inventorymodel"
@@ -182,8 +181,9 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 	// STEP of creating Items
 	itemReqs := []producthandler.ItemCreateBasicProduct{}
 	err = json.NewDecoder(strings.NewReader(productReqJSON.Items)).Decode(&itemReqs)
-	items := []productmodel.Item{}
 
+	items := []productmodel.Item{}
+	// variant or single
 	if productReqJSON.ProductKindID == productmodel.ProductKindVariant {
 		variantCreateReqs := []*productmodel.Variant{}
 		err = json.NewDecoder(strings.NewReader(productReqJSON.Variants)).Decode(&variantCreateReqs)
@@ -206,6 +206,23 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 			for i := 0; i < len(optionCreateReqs); i++ {
 				optionCreateReqs[i].VariantID = variantCreateReqs[idx].ID
 			}
+
+			// prepare item inventory
+			itemInventoryReqslice := []producthandler.ItemInventoryRequestCreateBasicProduct{}
+			err = json.NewDecoder(strings.NewReader(itemReq.ItemInventories)).Decode(&itemInventoryReqslice)
+
+			itemInventory := []inventorymodel.ItemInventory{}
+			for _, itemInventoryReq := range itemInventoryReqslice {
+				itemInventory = append(
+					itemInventory,
+					inventorymodel.ItemInventory{
+						ItemInventoryDetail: &inventorymodel.ItemInventoryDetail{
+							SubdistrictID: itemInventoryReq.SubdistrictID,
+						},
+					},
+				)
+			}
+
 			items = append(items,
 				productmodel.Item{
 					ProductID: productRes.ID,
@@ -218,6 +235,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 							Value: itemReq.Price,
 						},
 					},
+					ItemInventory: itemInventory,
 				},
 			)
 
@@ -225,6 +243,23 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 
 	} else if productReqJSON.ProductKindID == productmodel.ProductKindSingle {
 		for _, itemReq := range itemReqs {
+			// prepare item inventory
+			itemInventoryReqslice := []producthandler.ItemInventoryRequestCreateBasicProduct{}
+			err = json.NewDecoder(strings.NewReader(itemReq.ItemInventories)).Decode(&itemInventoryReqslice)
+
+			// loop itemreq
+			itemInventory := []inventorymodel.ItemInventory{}
+			for _, itemInventoryReq := range itemInventoryReqslice {
+				itemInventory = append(
+					itemInventory,
+					inventorymodel.ItemInventory{
+						ItemInventoryDetail: &inventorymodel.ItemInventoryDetail{
+							SubdistrictID: itemInventoryReq.SubdistrictID,
+						},
+					},
+				)
+			}
+
 			items = append(
 				items,
 				productmodel.Item{
@@ -237,6 +272,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 							Value: itemReq.Price,
 						},
 					},
+					ItemInventory: itemInventory,
 				},
 			)
 		}
@@ -251,47 +287,7 @@ func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthan
 		return err
 	}
 
-	var itemSubdistrictID int
-
-	if productReqJSON.ProductTypeID == productmodel.ProductTypeVendor {
-		brandDB := &productmodel.Brand{}
-		err = database.DB.Model(&productmodel.Brand{}).
-			Where("id = ?", productReqJSON.BrandID).Find(&brandDB).
-			Preload("UserVendor").
-			Error
-
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-
-		itemSubdistrictID = brandDB.UserVendor.SubdistrictID
-	} else {
-		itemSubdistrictID = inventorymodel.MainSubdistrict
-	}
-	// STEP ofCreating single product
-
-	itemInventories := []inventorymodel.ItemInventory{}
-	for _, item := range items {
-		itemInventories = append(
-			itemInventories,
-			inventorymodel.ItemInventory{
-				Keep:   0,
-				Stock:  0,
-				ItemID: item.ID,
-				ItemInventoryDetail: &inventorymodel.ItemInventoryDetail{
-					SubdistrictID: itemSubdistrictID,
-				},
-			},
-		)
-	}
-
-	err = tx.Debug().Model(&inventorymodel.ItemInventory{}).Create(&itemInventories).Error
-	if err != nil {
-		fmt.Printf("Error Creating Single Product \n %+v \n", err)
-		tx.Rollback()
-		return err
-	}
+	// STEP creating iteminventory
 
 	return tx.Commit().Error
 }
