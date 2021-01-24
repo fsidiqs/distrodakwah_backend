@@ -11,5 +11,5 @@ type Brand struct {
 	Name         string               `gorm:"type:varchar(255);not null" json:"name"`
 	UserVendorID uint32               `gorm:"type:INT;UNSIGNED;not null" json:"user_vendor_id"`
 	UserVendor   usermodel.UserVendor `gorm:"foreignKey:UserVendorID;references:ID" json:"user_vendor"`
-	ImageID      uint64               `gorm:"type:BIGINT;UNSIGNED;not null" json:"image_id"`
+	ImageID      int                  `gorm:"type:BIGINT;UNSIGNED;not null" json:"image_id"`
 }

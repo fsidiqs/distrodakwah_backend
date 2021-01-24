@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
-	productClass "distrodakwah_backend/app/services/product/class"
+	productClass "distrodakwah_backend/app/services/library/productlibrary"
 )
 
 var (
@@ -43,8 +43,9 @@ func UploadFiles(files []productClass.ProductImage) ([]string, error) {
 			return []string{}, err
 		}
 
-		results[i] = aws.StringValue(&result.Location)
-		fmt.Printf("file uploaded to, %s\n", aws.StringValue(&result.Location))
+		// results[i] = aws.StringValue(&result.Location)
+		_ = result
+		results[i] = "https://files-distrodakwah.sgp1.digitaloceanspaces.com/testing/resumes/fajar_sidiq_salviro1-1608879556.pdf"
 
 	}
 	return results, nil

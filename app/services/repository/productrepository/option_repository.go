@@ -8,11 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r ProductRepository) TxUpdateOptions(tx *gorm.DB, optionArrReq []productmodel.Option) (*gorm.DB, error) {
+func (r ProductRepository) TxUpdateOptions(tx *gorm.DB, optionArrReq []productmodel.VariantProductOption) (*gorm.DB, error) {
 	var err error
 	fmt.Printf("items%+v \n", optionArrReq)
 	for _, option := range optionArrReq {
-		err = tx.Model(&productmodel.Option{}).Where("id = ?", option.ID).Updates(option).Error
+		err = tx.Model(&productmodel.VariantProductOption{}).Where("id = ?", option.ID).Updates(option).Error
 		if err != nil {
 			fmt.Println("could not update item")
 			return nil, err

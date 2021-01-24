@@ -10,5 +10,5 @@ type Category struct {
 	Subdepartment   *Subdepartment `gorm:"foreignKey:SubdepartmentID" json:"subdepartment,omitempty"`
 	ParentID        uint           `gorm:"type:int;not null" json:"parent_id"`
 	Name            string         `gorm:"type:varchar(255);not null" json:"name"`
-	ImageID         uint64         `gorm:"type:bigint" json:"image_id"`
+	ImageID         int            `gorm:"type:bigint" json:"image_id"`
 }

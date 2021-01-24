@@ -14,7 +14,7 @@ import (
 // 	prodModel "distrodakwah_backend/app/services/product/model"
 // )
 
-func (r *OrderRepository) SaveOrder(orderReq orderhandler.OrderReq, userID uint64) error {
+func (r *OrderRepository) SaveOrder(orderReq orderhandler.OrderReq, userID int) error {
 	var err error
 	tx := r.DB.Begin()
 	user := usermodel.User{}

@@ -1,7 +1,7 @@
 package inventorylibrary
 
 type ItemInventoryXlsx struct {
-	ID    uint64
+	ID    int
 	Stock int `gorm:"type:INT;NOT NULL" json:"stock"`
 	Keep  int `gorm:"type:INT;NOT NULL" json:"keep"`
 }

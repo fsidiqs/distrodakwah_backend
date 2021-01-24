@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `tb_ro_cities` (
     `name` varchar(255) DEFAULT NULL,
     `postal_code` char(5) DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+)  DEFAULT CHARSET = utf8;
 
 INSERT INTO
     `tb_ro_cities` (
@@ -626,7 +626,7 @@ CREATE TABLE IF NOT EXISTS `tb_ro_provinces` (
     `id` int(11) NOT NULL,
     `name` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+)  DEFAULT CHARSET = utf8;
 
 INSERT INTO
     `tb_ro_provinces` (`id`, `name`)
@@ -671,10 +671,10 @@ CREATE TABLE IF NOT EXISTS `tb_ro_subdistricts` (
     `city_id` int(11) DEFAULT NULL,
     `name` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8;
+)  DEFAULT CHARSET = utf8;
 
 INSERT INTO
-    `tb_ro_subdistricts` (`id`, `city_id`, `subdistrict_name`)
+    `tb_ro_subdistricts` (`id`, `city_id`, `name`)
 VALUES
     (1, 1, "Arongan Lambalek"),
     (2, 1, "Bubon"),

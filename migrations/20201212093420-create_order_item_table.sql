@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `order_items` (
     `order_shipping_id` BIGINT UNSIGNED,
     CONSTRAINT order_items_order_id FOREIGN KEY(order_id) references orders(id),
     CONSTRAINT order_items_order_shipping_id FOREIGN KEY(order_shipping_id) references order_shippings(id)
-) Engine = InnoDB;
+);
 
 -- +migrate Down
 DROP TABLE `order_items`;

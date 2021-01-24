@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `products` (
     `product_type_id` INT UNSIGNED NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `description` TEXT NOT NULL,
-    `status` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    `status` VARCHAR(10) NOT NULL DEFAULT "A",
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
     `deleted_at` TIMESTAMP NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `products` (
     CONSTRAINT products_brand_id FOREIGN KEY(brand_id) references brands(id),
     CONSTRAINT products_category_id FOREIGN KEY(category_id) references categories(id),
     CONSTRAINT products_product_kind_id FOREIGN KEY(product_kind_id) references product_kinds(id)
-) ENGINE = InnoDB;
+);
 
 -- +migrate Down
 DROP TABLE `products`;

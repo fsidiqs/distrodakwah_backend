@@ -12,7 +12,7 @@ import (
 
 type UserReseller struct {
 	ID             uint32         `gorm:"primaryKey;autoIncrement;not null"`
-	UserID         uint64         `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"user_id"`
+	UserID         int            `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"user_id"`
 	CreatedAt      time.Time      `json:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`

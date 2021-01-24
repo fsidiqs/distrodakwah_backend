@@ -21,7 +21,6 @@ func Init() {
 func productAuthGroup(g *echo.Group) {
 	g.GET("", productController.Gets)
 	g.POST("", productController.Post)
-	g.POST("/create-product-basic-structure", productController.CreateProductBasicStructure)
 	g.PUT("/:product_id/edit", productController.UpdateProduct)
 
 }
@@ -31,6 +30,7 @@ func SetProductGroup(g *echo.Group) {
 
 	// authGroup := g.Group("", middleware.CheckAuthMiddleware, middleware.AdminRoleMiddleware)
 	productAuthGroup(authGroup)
+	g.POST("/create-product-basic-structure", productController.CreateProductBasicStructure)
 
 	g.GET("/generate-price-template", productController.GeneratePriceTemplate)
 	g.POST("/import-prices", productController.ImportPrices)

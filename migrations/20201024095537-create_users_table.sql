@@ -8,12 +8,12 @@ CREATE TABLE IF NOT EXISTS `users`(
     `role_id` TINYINT UNSIGNED NOT NULL,
     `gender` enum('male', 'female') NOT NULL DEFAULT 'male',
     `birthdate` date NOT NULL,
-    `status` VARCHAR(10) UNSIGNED NOT NULL DEFAULT "A",
+    `status` VARCHAR(10) NOT NULL DEFAULT "A",
     `created_at` timestamp NULL DEFAULT NULL,
     `deleted_at` timestamp NULL DEFAULT NULL,
     `forgot_papssword_token` VARCHAR(255) DEFAULT NULL
 
-) Engine = InnoDB;
+);
 
 ALTER TABLE
     `users`

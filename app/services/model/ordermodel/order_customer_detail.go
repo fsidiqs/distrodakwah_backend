@@ -8,12 +8,12 @@ import (
 )
 
 type OrderCustomer struct {
-	ID            uint64 `gorm:"primaryKey;autoIncrement;not null"`
-	OrderID       uint64 `json:"order_id"`
-	CustomerID    uint64 `json:"customer_id"`
+	ID            int    `gorm:"primaryKey;autoIncrement;not null"`
+	OrderID       int    `json:"order_id"`
+	CustomerID    int    `json:"customer_id"`
 	Name          string `gorm:"type:varchar(255);not null" json:"name"`
 	AddressDetail string `json:"address_detail"`
-	SubdistrictID uint64 `json:"subdistrict_id"`
+	SubdistrictID int    `json:"subdistrict_id"`
 	PostalCode    string `json:"postal_code"`
 	Phone         string `json:"phone"`
 	Email         string `jsonn:"email"`
@@ -37,6 +37,6 @@ func (oc *OrderCustomerDetail) PopulateData() error {
 	return nil
 }
 
-func (oc *OrderCustomerDetail) UpdateOrderID(id uint64) {
+func (oc *OrderCustomerDetail) UpdateOrderID(id int) {
 	oc.OrderID = id
 }

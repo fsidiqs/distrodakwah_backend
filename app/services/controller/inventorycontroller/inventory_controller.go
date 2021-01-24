@@ -64,7 +64,7 @@ func (ic *InventoryController) GetProductStocks(c echo.Context) error {
 }
 
 func (ic *InventoryController) GetProductStock(c echo.Context) error {
-	itemInventoryID, err := strconv.ParseUint(c.Param("item_inventory_id"), 10, 64)
+	itemInventoryID, err := strconv.Atoi(c.Param("item_inventory_id"))
 	preloadReq := c.QueryParam("preload")
 
 	if err != nil {
@@ -163,7 +163,7 @@ func (ic *InventoryController) ImportStocks(c echo.Context) error {
 			stockTempl = append(
 				stockTempl,
 				inventorylibrary.ItemInventoryXlsx{
-					ID:    uint64(ID),
+					ID:    int(ID),
 					Stock: int(stock),
 					Keep:  int(keep),
 				},

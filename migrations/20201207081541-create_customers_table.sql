@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `customers`(
     `user_reseller_id` BIGINT UNSIGNED NOT NULL,
     CONSTRAINT customers_user_reseller_id FOREIGN KEY(user_reseller_id) references user_resellers(id),
     CONSTRAINT customers_subdistrict_id FOREIGN KEY(subdistrict_id) references tb_ro_subdistricts(id)
-) Engine = InnoDB;
+);
 
 -- +migrate Down
 DROP TABLE `customers`;

@@ -32,7 +32,7 @@ func (r *InventoryRepository) FetchAll(req inventoryhandler.FetchAllReq) (*pagin
 		Limit(res.Metadata.Limit).
 		Find(&products).Error
 
-	prodIDArr := []uint64{}
+	prodIDArr := []int{}
 	for _, product := range products {
 		prodIDArr = append(
 			prodIDArr,
@@ -60,7 +60,7 @@ func (r *InventoryRepository) ExportInventory() ([]productmodel.Item, error) {
 	products := []*productmodel.ProductSimpleInfo{}
 	err = r.DB.Model(&productmodel.ProductSimpleInfo{}).Unscoped().Find(&products).Error
 
-	prodIDArr := []uint64{}
+	prodIDArr := []int{}
 	for _, product := range products {
 		prodIDArr = append(prodIDArr, product.ID)
 	}
@@ -77,18 +77,19 @@ func (r *InventoryRepository) ExportInventory() ([]productmodel.Item, error) {
 }
 
 type FindReq struct {
-	ItemInventoryID uint64
+	ItemInventoryID int
 	Preload         httphelper.Preload
 }
 
-func (ir *InventoryRepository) Find(req FindReq) (*inventorymodel.ItemInventory, error) {
-	var err error
+func (ir *InventoryRepository) Find(req FindReq) (*inventorymodel.SPIInventory, error) {
+	return nil, nil
+	// var err error
 
-	itemIntenvory := &inventorymodel.ItemInventory{}
+	// itemIntenvory := &inventorymodel.ItemInventory{}
 
-	err = ir.DB.Model(&inventorymodel.ItemInventory{}).
-		Preload("ItemInventoryDetail.Subdistrict").
-		First(&itemIntenvory, req.ItemInventoryID).Error
+	// err = ir.DB.Model(&inventorymodel.ItemInventory{}).
+	// 	Preload("ItemInventoryDetail.Subdistrict").
+	// 	First(&itemIntenvory, req.ItemInventoryID).Error
 
-	return itemIntenvory, err
+	// return itemIntenvory, err
 }

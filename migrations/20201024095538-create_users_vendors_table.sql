@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `user_vendors`(
     `deleted_at` timestamp NULL DEFAULT NULL,
     CONSTRAINT user_vendors_user_id FOREIGN KEY(user_id) references users(id),
     CONSTRAINT user_vendors_subdistrict_id FOREIGN KEY(subdistrict_id) references tb_ro_subdistricts(id)
-) Engine = InnoDB;
+);
 
 -- +migrate Down
 DROP TABLE `users_vendors`;

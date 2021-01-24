@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `order_shippings` (
     `type_id` TINYINT UNSIGNED,
     CONSTRAINT order_shippings_order_id FOREIGN KEY(order_id) references orders(id),
     CONSTRAINT order_shippings_shipping_company_id FOREIGN KEY(shipping_company_id) references shipping_companies(id)
-) Engine = InnoDB;
+);
 
 -- +migrate Down
 DROP TABLE `order_shippings`;

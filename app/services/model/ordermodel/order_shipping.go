@@ -7,8 +7,8 @@ import (
 )
 
 type OrderShipping struct {
-	ID                  uint64  `gorm:"primaryKey;autoIncrement;not null"`
-	OrderID             uint64  `json:"order_id"`
+	ID                  int     `gorm:"primaryKey;autoIncrement;not null"`
+	OrderID             int     `json:"order_id"`
 	ShippingCost        float64 `gorm:"type:decimal(19,2);not null;default:0.0" json:"shipping_cost"`
 	TotalCost           float64 `gorm:"type:decimal(19,2);not null;default:0.0" json:"total_cost"`
 	Weight              int     `gorm:"not null" json:"weight"`
@@ -30,7 +30,7 @@ func (os OrderShippings) FindOrderShippingIndexByOriginID(originID int) (int, bo
 	return 0, false
 }
 
-func (OrderShippings) PrepareShippings(orderID uint64, orderItemIs []OrderItemI) (*OrderShippings, error) {
+func (OrderShippings) PrepareShippings(orderID int, orderItemIs []OrderItemI) (*OrderShippings, error) {
 	// var orderShipping []*OrderShipping
 	orderShippingArr := &OrderShippings{}
 

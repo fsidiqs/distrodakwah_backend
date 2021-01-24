@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `order_customers` (
     CONSTRAINT order_customers_customer_id FOREIGN KEY(order_id) references customers(id),
     CONSTRAINT order_customers_user_reseller_id FOREIGN KEY(user_reseller_id) references user_resellers(id),
     CONSTRAINT order_customers_subdistrict_id FOREIGN KEY(subdistrict_id) references tb_ro_subdistricts(id)
-) ENGINE = InnoDB;
+);
 
 -- +migrate Down
 DROP TABLE `order_customers`;

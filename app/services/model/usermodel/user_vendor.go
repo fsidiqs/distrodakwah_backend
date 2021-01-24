@@ -11,7 +11,7 @@ type UserVendor struct {
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	UserID       uint64         `json:"user_id"`
+	UserID       int            `json:"user_id"`
 	LocationType string         `json:"location_type"`
 	LocationID   int            `gorm:"type:int;not null" json:"location_id"`
 	Address      string         `gorm:"type:text;not null" json:"address"`

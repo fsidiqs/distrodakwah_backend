@@ -1,8 +1,8 @@
 package productmodel
 
 type ProductsProductImage struct {
-	ProductID      uint64        `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
-	ProductImageID uint64        `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_image_id"`
+	ProductID      int           `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
+	ProductImageID int           `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_image_id"`
 	ProductImage   *ProductImage `gorm:"foreignKey:ProductImageID" json:"product_image"`
 }
 

@@ -1,10 +1,10 @@
 package ordermodel
 
 type OrderItemOld struct {
-	// OrderID uint64
+	// OrderID int
 	Qty int
 	// KindID uint8
-	ItemID uint64
+	ItemID int
 }
 
 type OrderItemArr []*OrderItem
@@ -14,7 +14,7 @@ type OrderItemI interface {
 	GetVendorSubdistrictID() int
 	GetSellingPrice() (float64, bool)
 	GetWeight() int
-	SetOrderShippingID(id uint64)
+	SetOrderShippingID(id int)
 	ReturnCreate(order *OrderClass) (uint8, map[string]interface{}, error)
 	ReturnModels() interface{}
 }
@@ -26,20 +26,20 @@ type OrderItemI interface {
 type OrderItemReq struct {
 	Qty    int
 	KindID uint8
-	ItemID uint64
+	ItemID int
 }
 
 type OrderItemReqArr []*OrderItemReq
 
 // type OrderItemWithItemID struct {
-// 	OrderID uint64
+// 	OrderID int
 // 	Qty     int
 // 	// UnitWeight           int
 // 	KindID uint8
-// 	ItemID uint64
+// 	ItemID int
 // 	// DropshipperItemPrice float64
 // 	// RetailItemPrice      float64
-// 	// OrderShippingID      uint64
+// 	// OrderShippingID      int
 // 	// SPInventory          *invModel.SPInventory `gorm:"foreignKey:SingleProductID;references:ItemID"`
 // 	// VPInventory          *invModel.VPInventory `gorm:"foreignKey:VariantProductID;references:ItemID"`
 // }

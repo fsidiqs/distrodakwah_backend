@@ -10,7 +10,7 @@ import (
 type ShippingDetails struct {
 	OriginSubID     int
 	Weight          int
-	DestSubID       uint64
+	DestSubID       int
 	ShipName        string
 	ShipServiceName string
 }

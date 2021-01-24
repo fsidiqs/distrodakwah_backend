@@ -20,7 +20,7 @@ type EmailContext struct {
 }
 
 type UserMiddleware struct {
-	ID     uint64
+	ID     int
 	Email  string
 	RoleID uint8
 }

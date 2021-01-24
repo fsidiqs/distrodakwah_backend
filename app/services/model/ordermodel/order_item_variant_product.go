@@ -8,16 +8,16 @@ import (
 )
 
 type OrderItemVariantProduct struct {
-	ID               uint64                `gorm:"primaryKey;autoIncrement;not null"`
-	OrderID          uint64                `json:"order_id"`
-	VariantProductID uint64                `json:"variant_product_id"`
+	ID               int                   `gorm:"primaryKey;autoIncrement;not null"`
+	OrderID          int                   `json:"order_id"`
+	VariantProductID int                   `json:"variant_product_id"`
 	VPInventory      *invModel.VPInventory `gorm:"foreignKey:VariantProductID" json:"vp_inventory"`
 	Qty              int                   `json:"qty"`
 	UnitWeight       int                   `json:"unit_weight"`
 	// DropshipperItemPrice float64               `gorm:"type:decimal(19,2);not null;default:0.0" json:"dropshipper_item_price"`
 	// RetailItemPrice      float64               `gorm:"type:decimal(19,2);not null;default:0.0" json:"retail_item_price"`
 	Prices          *OrderItemVPPriceArr `gorm:"-" json:"prices"`
-	OrderShippingID uint64               `json:"order_shipping_id"`
+	OrderShippingID int                  `json:"order_shipping_id"`
 }
 
 func (OrderItemVariantProduct) ReturnModels() interface{} {
@@ -36,7 +36,7 @@ func (oi OrderItemVariantProduct) ReturnCreate(order *OrderClass) (uint8, map[st
 
 }
 
-func (oi *OrderItemVariantProduct) SetOrderShippingID(id uint64) {
+func (oi *OrderItemVariantProduct) SetOrderShippingID(id int) {
 	(*oi).OrderShippingID = id
 }
 
@@ -102,7 +102,7 @@ func (oi OrderItemVariantProduct) PopulateData() error {
 	return nil
 }
 
-func (OrderItemVariantProduct) SubdistrictID(itemID uint64) (int, error) {
+func (OrderItemVariantProduct) SubdistrictID(itemID int) (int, error) {
 	VPInventory := &invModel.VPInventory{}
 	err := database.DB.Model(&invModel.VPInventory{}).
 		Where("variant_product_id = ?", itemID).

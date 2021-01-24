@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `categories`(
     `deleted_at` TIMESTAMP NULL,
     CONSTRAINT categories_subdepartment_id foreign key(subdepartment_id) references subdepartments(id),
     CONSTRAINT categories_image_id foreign key(image_id) references images(id)
-) ENGINE = InnoDB;
+);
 
 -- +migrate Down
 DROP TABLE `categories`;

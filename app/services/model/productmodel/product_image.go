@@ -5,8 +5,9 @@ import (
 )
 
 type ProductImage struct {
-	ID  uint64 `gorm:"primaryKey;autoIncrement;not null"`
-	URL string `gorm:"type:varchar(255);not null" json:"url"`
+	ID        int    `gorm:"primaryKey;autoIncrement;not null"`
+	ProductID uint   `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
+	URL       string `gorm:"type:varchar(255);not null" json:"url"`
 }
 
 // ProductImageURL used in basic create product

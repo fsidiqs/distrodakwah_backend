@@ -12,8 +12,6 @@ func (r *ProductRepository) SaveProductProductImageTx(productsProductImage []*pr
 	err := tx.Model(&productmodel.ProductsProductImage{}).Create(&productsProductImage).Error
 	if err != nil {
 		fmt.Printf("error creating ProductsProductImages\n %+v \n", err)
-		fmt.Println("test")
-
 		tx.Rollback()
 		return err
 	}

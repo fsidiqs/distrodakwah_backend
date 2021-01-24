@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `brands` (
     PRIMARY KEY (`id`),
     CONSTRAINT brands_user_vendor_id foreign key(user_vendor_id) references user_vendors(id),
     CONSTRAINT brands_image_id foreign key(image_id) references images(id)
-) ENGINE = InnoDB;
+);
 
 -- +migrate Down
 DROP TABLE `brands`;

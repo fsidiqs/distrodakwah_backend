@@ -14,6 +14,7 @@ import (
 	"distrodakwah_backend/app/database"
 	"distrodakwah_backend/app/helper/httphelper"
 	"distrodakwah_backend/app/helper/pagination"
+	"distrodakwah_backend/app/services/digitalocean"
 	"distrodakwah_backend/app/services/handler/producthandler"
 	"distrodakwah_backend/app/services/library/productlibrary"
 	"distrodakwah_backend/app/services/model/productmodel"
@@ -102,7 +103,7 @@ func (pc *ProductController) Gets(c echo.Context) error {
 
 func (pc *ProductController) Post(c echo.Context) error {
 
-	product := &producthandler.ProductFromRequestJSON{}
+	product := &producthandler.ProductJSONParsed{}
 	// var product map[string]interface{}
 	if err := c.Bind(&product); err != nil {
 		fmt.Printf("error: %+v ", err)
@@ -116,8 +117,6 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 	formReq, _ := c.MultipartForm()
 	productReq := c.FormValue("product")
 	files := formReq.File["product_images"]
-	product := &producthandler.ProductFromRequestJSON{}
-
 	theFiles := make([]productlibrary.ProductImage, len(files))
 
 	for i, file := range files {
@@ -142,31 +141,22 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 	}
 
 	// ! Update this
-	// productImageURLs, err := digitalocean.UploadFiles(theFiles)
+
+	productable, err := productlibrary.ConstructProduct(productReq)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Failed Constructing product")
+	}
+	productImageURLs, err := digitalocean.UploadFiles(theFiles)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "Image Upload failed")
 	}
-	if productReq != "" {
-		err = json.NewDecoder(strings.NewReader(productReq)).Decode(&product)
-	}
-	productImageURLs := []string{"test.jpeg"}
-	for _, imgURL := range productImageURLs {
-		product.ProductImages = append(
-			product.ProductImages,
-			productmodel.ProductImage{
-				URL: imgURL,
-			},
-		)
-	}
+
+	productable.SetProductImages(productImageURLs)
+
+	err = productable.SaveProduct()
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, httphelper.BadRequestMessage)
-	}
-
-	err = pc.ProductRepository.SaveProductBasicStructure(product)
-	if err != nil {
-		fmt.Printf("error creating product: %+v", err)
-		return c.JSON(http.StatusInternalServerError, httphelper.InternalServerErrorMessage)
+		fmt.Printf("error creating  \n %+v \n", err)
 	}
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }
@@ -178,13 +168,13 @@ func (pc *ProductController) UpdateProduct(c echo.Context) (err error) {
 	editProduct, err := productlibrary.ProductDecoder(productReq)
 
 	var deletedAt gorm.DeletedAt
-	if editProduct.DeletedAt == true {
-		deletedAt = gorm.DeletedAt{
-			Time: time.Now(),
-		}
-	} else {
-		deletedAt = gorm.DeletedAt{}
-	}
+	// if editProduct.DeletedAt == true {
+	// 	deletedAt = gorm.DeletedAt{
+	// 		Time: time.Now(),
+	// 	}
+	// } else {
+	// 	deletedAt = gorm.DeletedAt{}
+	// }
 	product := productmodel.Product{
 		ID:            editProduct.ID,
 		UpdatedAt:     time.Now(),
@@ -198,10 +188,10 @@ func (pc *ProductController) UpdateProduct(c echo.Context) (err error) {
 	}
 	tx := database.DB.Begin()
 	tx, err = pc.ProductRepository.TxUpdateProduct(tx, product)
-	tx, err = pc.ProductRepository.TxUpdateItemPrices(tx, editProduct.ItemPrices)
-	tx, err = pc.ProductRepository.TxUpdateItems(tx, editProduct.Items)
-	tx, err = pc.ProductRepository.TxUpdateVariants(tx, editProduct.Variants)
-	tx, err = pc.ProductRepository.TxUpdateOptions(tx, editProduct.Options)
+	// tx, err = pc.ProductRepository.TxUpdateItemPrices(tx, editProduct.ItemPrices)
+	// tx, err = pc.ProductRepository.TxUpdateItems(tx, editProduct.Items)
+	// tx, err = pc.ProductRepository.TxUpdateVariants(tx, editProduct.Variants)
+	// tx, err = pc.ProductRepository.TxUpdateOptions(tx, editProduct.Options)
 	err = tx.Commit().Error
 	return nil
 }
@@ -239,7 +229,7 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 		return err
 	}
 
-	pricesXLSX := []productmodel.ItemPrice{}
+	pricesXLSX := []productmodel.SPItemPrice{}
 
 	rows := xlsx.GetRows("Item Prices")
 	if err != nil {
@@ -254,10 +244,10 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 			tempPriceValue, _ := strconv.ParseFloat(rows[i][4], 10)
 			pricesXLSX = append(
 				pricesXLSX,
-				productmodel.ItemPrice{
-					ItemID: TempItemID,
-					Name:   rows[i][3],
-					Value:  tempPriceValue,
+				productmodel.SPItemPrice{
+					SPItemID: uint(TempItemID),
+					Name:     rows[i][3],
+					Value:    tempPriceValue,
 				},
 			)
 

@@ -11,7 +11,7 @@ import (
 )
 
 type User struct {
-	ID        uint64         `gorm:"primaryKey;autoIncrement;not null"`
+	ID        int            `gorm:"primaryKey;autoIncrement;not null"`
 	CreatedAt time.Time      `json:"created_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Gender    string         `gorm:"type:enum;UNSIGNED;NOT NULL" json:"gender"`
@@ -62,7 +62,7 @@ func (u User) Validate() error {
 }
 
 type UserWithChild struct {
-	ID           uint64         `gorm:"primaryKey;autoIncrement;not null"`
+	ID           int            `gorm:"primaryKey;autoIncrement;not null"`
 	CreatedAt    time.Time      `json:"created_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Gender       string         `gorm:"type:enum;UNSIGNED;NOT NULL" json:"gender"`
