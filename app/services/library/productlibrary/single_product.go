@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type SingleProduct struct {
+type SingleProductForCreate struct {
 	ID                uint               `gorm:"primaryKey;autoIncrement;not null"`
 	CreatedAt         time.Time          `json:"created_at"`
 	UpdatedAt         time.Time          `json:"updated_at"`
@@ -29,6 +29,22 @@ type SingleProduct struct {
 	SingleProductItem *SingleProductItem `json:"single_product_item"`
 }
 
+type SingleProduct struct {
+	ID                uint                        `gorm:"primaryKey;autoIncrement;not null"`
+	CreatedAt         time.Time                   `json:"created_at"`
+	UpdatedAt         time.Time                   `json:"updated_at"`
+	DeletedAt         sql.NullTime                `json:"deleted_at"`
+	BrandID           uint                        `json:"brand_id"`
+	CategoryID        uint                        `json:"category_id"`
+	ProductTypeID     uint8                       `json:"product_type_id"`
+	ProductKindID     uint8                       `json:"product_kind_id"`
+	Name              string                      `json:"name"`
+	Description       string                      `json:"description"`
+	Status            string                      `json:"status"`
+	ProductImages     []productmodel.ProductImage `gorm:"-" json:"product_images"`
+	SingleProductItem *SingleProductItem          `json:"single_product_item"`
+}
+
 func (p SingleProduct) SaveProduct() error {
 	var DB *gorm.DB = database.DB
 	var err error
@@ -36,7 +52,7 @@ func (p SingleProduct) SaveProduct() error {
 	productImages := []productmodel.ProductImage{}
 	for _, productimage := range p.ProductImages {
 		productImages = append(productImages, productmodel.ProductImage{
-			URL: productimage,
+			URL: productimage.URL,
 		})
 	}
 
@@ -112,32 +128,54 @@ func (p SingleProduct) SaveProduct() error {
 	}
 	return tx.Commit().Error
 }
+func (p *SingleProduct) FetchProductable() error {
+	var err error
+	var DB *gorm.DB = database.DB
 
-func (p SingleProduct) GetProductableItems() []Item {
-	return []Item{
-		Item{
-			Weight: p.SingleProductItem.Weight,
-			Sku:    p.SingleProductItem.Sku,
-		},
+	singleProductItemDB := productmodel.SingleProductItem{}
+	err = DB.Model(&productmodel.SingleProductItem{}).
+		Where("product_id = ?", p.ID).
+		Find(&singleProductItemDB).Error
+	if err != nil {
+		fmt.Println("error fetching products")
+		return nil
 	}
+
+	itemPricesDB := []SPItemPrice{}
+	err = DB.Model(&productmodel.SPItemPrice{}).
+		Joins("INNER JOIN SP_items on SP_items.id = SP_item_prices.SP_item_id").
+		Where("SP_items.id = ?", singleProductItemDB.ID).
+		Find(&itemPricesDB).Error
+
+	if err != nil {
+		fmt.Println("fetching fetchign prices")
+		return nil
+	}
+
+	p.SingleProductItem = &SingleProductItem{
+		ProductID:    p.ID,
+		Weight:       singleProductItemDB.Weight,
+		Sku:          singleProductItemDB.Sku,
+		SPItemPrices: itemPricesDB,
+	}
+	return nil
 }
 
-func (p SingleProduct) GetProductable() Product {
-	items := []Item{}
-	items = append(items, Item{})
-	return Product{
-		ID:                p.ID,
-		CreatedAt:         p.CreatedAt,
-		UpdatedAt:         p.UpdatedAt,
-		DeletedAt:         p.DeletedAt,
-		BrandID:           p.BrandID,
-		CategoryID:        p.CategoryID,
-		ProductTypeID:     p.ProductTypeID,
-		ProductKindID:     p.ProductKindID,
-		Name:              p.Name,
-		Description:       p.Description,
-		Status:            p.Status,
-		ProductImages:     p.ProductImages,
+func (p SingleProduct) GetProductable() *Product {
+
+	return &Product{
+		ID:            p.ID,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
+		DeletedAt:     p.DeletedAt,
+		BrandID:       p.BrandID,
+		CategoryID:    p.CategoryID,
+		ProductTypeID: p.ProductTypeID,
+		ProductKindID: p.ProductKindID,
+		Name:          p.Name,
+		Description:   p.Description,
+		Status:        p.Status,
+		// ProductImages:     p.ProductImages,
 		SingleProductItem: p.SingleProductItem,
 	}
 }
@@ -145,7 +183,9 @@ func (p SingleProduct) GetProductable() Product {
 func (p *SingleProduct) SetProductImages(urls []string) {
 	for _, url := range urls {
 
-		p.ProductImages = append(p.ProductImages, url)
+		p.ProductImages = append(p.ProductImages, productmodel.ProductImage{
+			URL: url,
+		})
 	}
 }
 

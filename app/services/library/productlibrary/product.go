@@ -7,38 +7,70 @@ import (
 	"strings"
 	"time"
 
+	"distrodakwah_backend/app/database"
 	"distrodakwah_backend/app/services/handler/producthandler"
 	"distrodakwah_backend/app/services/model/productmodel"
+
+	"gorm.io/gorm"
 )
 
 type ProductI interface {
-	GetProductable() Product
-	// GetProductableItems() []Item
 	SetProductImages([]string)
-	ProductSaveable
+	ProductSaveI
 }
 
-type ProductSaveable interface {
+type ProductSaveI interface {
 	SaveProduct() error
 }
+
 type Product struct {
-	ID                  uint                 `json:"id"`
-	CreatedAt           time.Time            `json:"created_at"`
-	UpdatedAt           time.Time            `json:"updated_at"`
-	DeletedAt           sql.NullTime         `json:"deleted_at"`
-	BrandID             uint                 `json:"brand_id"`
-	CategoryID          uint                 `json:"category_id"`
-	ProductTypeID       uint8                `json:"product_type_id"`
-	ProductKindID       uint8                `json:"product_kind_id"`
-	Name                string               `json:"name"`
-	Description         string               `json:"description"`
-	Status              string               `json:"status"`
-	ProductImages       []string             `json:"product_images"`
-	SingleProductItem   *SingleProductItem   `json:"single_product_item"`
-	VariantProductItems []VariantProductItem `json:"variant_product_item"`
-	// ItemPrices    []productmodel.ItemPrice `json:"item_prices"`
-	// Variants      []productmodel.Variant   `json:"variants"`
-	// Options       []productmodel.Option    `json:"options"`
+	ID                     uint                 `json:"id"`
+	CreatedAt              time.Time            `json:"created_at"`
+	UpdatedAt              time.Time            `json:"updated_at"`
+	DeletedAt              sql.NullTime         `json:"deleted_at"`
+	BrandID                uint                 `json:"brand_id"`
+	CategoryID             uint                 `json:"category_id"`
+	ProductTypeID          uint8                `json:"product_type_id"`
+	ProductKindID          uint8                `json:"product_kind_id"`
+	Name                   string               `json:"name"`
+	Description            string               `json:"description"`
+	Status                 string               `json:"status"`
+	ProductImages          []ProductImageURL    `gorm:"-" json:"product_images"`
+	SingleProductItem      *SingleProductItem   `gorm:"-" json:"single_product_item"`
+	VariantProductItems    []VariantProductItem `gorm:"-" json:"variant_product_item"`
+	VariantProductVariants []VPVariant          `gorm:"-" json:"variant_products"`
+}
+
+func (p Product) DBtoSingleProduct() SingleProduct {
+	return SingleProduct{
+		ID:            p.ID,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
+		DeletedAt:     p.DeletedAt,
+		BrandID:       p.BrandID,
+		CategoryID:    p.CategoryID,
+		ProductTypeID: p.ProductTypeID,
+		ProductKindID: p.ProductKindID,
+		Name:          p.Name,
+		Description:   p.Description,
+		Status:        p.Status,
+	}
+}
+
+func (p Product) DBtoVariantProduct() VariantProduct {
+	return VariantProduct{
+		ID:            p.ID,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
+		DeletedAt:     p.DeletedAt,
+		BrandID:       p.BrandID,
+		CategoryID:    p.CategoryID,
+		ProductTypeID: p.ProductTypeID,
+		ProductKindID: p.ProductKindID,
+		Name:          p.Name,
+		Description:   p.Description,
+		Status:        p.Status,
+	}
 }
 
 type EditProductReq struct {
@@ -134,4 +166,57 @@ func ConstructProduct(productReqJson string) (ProductI, error) {
 		productable, err = NewVariantProduct(productReqParsed)
 	}
 	return productable, nil
+}
+
+// func GetProductPrices(productids []int) (ItemPriceI, error) {
+// 	var err error
+// 	var DB *gorm.DB = database.DB
+// 	var itemPriceable ItemPriceI
+
+// 	productDBs := []productmodel.Product{}
+// 	err = DB.Model(&productmodel.Product{}).Where("id IN (?)", productids).
+// 		Find(&productDBs).Error
+
+// 	if err != nil {
+// 		fmt.Println("error fetchign Products")
+// 		return nil, err
+// 	}
+// 	productables := make([]ProductI, len(productDBs))
+// 	for i, productdb := range productDBs {
+// 		if productdb.ProductKindID == productmodel.ProductKindSingle {
+// 			productables[i] = &SingleProduct{
+// 				ID: productdb.ID,
+// 			}
+// 		}
+// 		//productable.getPricesByProductID()
+// 	}
+// }
+
+func GetAllProducts() ([]ProductI, error) {
+	var err error
+	var DB *gorm.DB = database.DB
+
+	productDBs := []Product{}
+	err = DB.Model(&productmodel.Product{}).Find(&productDBs).Error
+	if err != nil {
+		fmt.Println("error fetching all products")
+		return nil, err
+	}
+	productables := make([]ProductI, len(productDBs))
+	// singleProducts := []SingleProduct{}
+	// variantProducts := []VariantProduct{}
+
+	for i, productdb := range productDBs {
+		if productdb.ProductKindID == productmodel.ProductKindSingle {
+			sp := productdb.DBtoSingleProduct()
+			sp.FetchProductable()
+			productables[i] = &sp
+		} else if productdb.ProductKindID == productmodel.ProductKindVariant {
+			vp := productdb.DBtoVariantProduct()
+			vp.FetchProductable()
+			productables[i] = &vp
+		}
+	}
+
+	return productables, nil
 }

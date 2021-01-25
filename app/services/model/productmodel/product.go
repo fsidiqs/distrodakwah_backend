@@ -33,9 +33,9 @@ type Product struct {
 	Status        string         `gorm:"type:NOT NULL;default:0" json:"status"`
 	ProductImages []ProductImage `gorm:"foreignKey:ProductID;references:ID" json:"product_images"`
 	// Items         []Item         `gorm:"foreignKey:ProductID;references:ID" json:"prices"`
-	SingleProductItem   *SingleProductItem      `gorm:"foreignKey:ProductID;references:ID" json:"single_product_item"`
-	VariantProductItems []VariantProductItem    `gorm:"foreignKey:ProductID;references:ID" json:"variant_product_item"`
-	VariantProducts     []VariantProductVariant `gorm:foreignKey:ProductID;references:ID" json:"variant_products"`
+	SingleProductItem      *SingleProductItem      `gorm:"foreignKey:ProductID;references:ID" json:"single_product_item"`
+	VariantProductItems    []VariantProductItem    `gorm:"foreignKey:ProductID;references:ID" json:"variant_product_item"`
+	VariantProductVariants []VariantProductVariant `gorm:"foreignKey:ProductID;references:ID" json:"variant_products"`
 }
 
 type ProductResponse struct {

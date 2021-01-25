@@ -10,10 +10,11 @@ import (
 type VariantProductItem struct {
 	ID                    uint                            `json:"id"`
 	ProductID             uint                            `json:"product_id"`
-	VariantProductOptions []string                        `json:"variant_product_options"`
+	VariantProductOptions []VPOption                      `gorm:"-" json:"variant_product_options"`
 	Weight                int                             `json:"weight"`
 	Sku                   string                          `json:"sku"`
-	VPIInventories        []inventorylibrary.VPIInventory `json:"VPIInventory"`
+	VPIInventories        []inventorylibrary.VPIInventory `gorm:"-" json:"VPIInventory"`
+	VPItemPrices          []VPItemPrice                   `gorm:"-"`
 }
 
 func NewVariantProductItem(itemReqJson string) ([]VariantProductItem, error) {
@@ -34,13 +35,18 @@ func NewVariantProductItem(itemReqJson string) ([]VariantProductItem, error) {
 		if err != nil {
 			return nil, err
 		}
-
+		vpOptions := make([]VPOption, len(options))
+		for i, option := range options {
+			vpOptions[i] = VPOption{
+				Name: option,
+			}
+		}
 		// options
 		VPIInventories, err := inventorylibrary.NewVPIInventory(itemReq.SubdistrictIDs)
 		variantProductItems[i] = VariantProductItem{
 			Weight:                itemReq.Weight,
 			Sku:                   itemReq.Sku,
-			VariantProductOptions: options,
+			VariantProductOptions: vpOptions,
 			VPIInventories:        VPIInventories,
 		}
 

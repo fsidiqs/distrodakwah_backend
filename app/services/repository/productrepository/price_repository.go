@@ -10,6 +10,7 @@ import (
 type M map[string]interface{}
 
 func (r *ProductRepository) GeneratePriceTemplate(productIDArr []int) (productauxmodel.ItemPriceArrExport, error) {
+
 	return nil, nil
 	// items := []productmodel.ItemForPriceExport{}
 

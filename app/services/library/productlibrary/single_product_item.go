@@ -8,10 +8,11 @@ import (
 )
 
 type SingleProductItem struct {
+	ProductID      uint
 	Weight         int                             `json:"weight"`
 	Sku            string                          `json:"sku"`
-	SPIInventories []inventorylibrary.SPIInventory `json:"SPIInventory"`
-	SPItemPrices   []SPItemPrice
+	SPIInventories []inventorylibrary.SPIInventory `gorm:"-" json:"SPIInventory"`
+	SPItemPrices   []SPItemPrice                   `gorm:"-"`
 }
 
 func NewSingleProductItem(itemReqJson string) (*SingleProductItem, error) {
@@ -34,3 +35,5 @@ func NewSingleProductItem(itemReqJson string) (*SingleProductItem, error) {
 
 	return item, nil
 }
+
+// func (s SingleProductItem) GetItemPriceableByProductID()

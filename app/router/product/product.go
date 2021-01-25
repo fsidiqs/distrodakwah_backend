@@ -2,7 +2,6 @@ package api
 
 import (
 	"distrodakwah_backend/app/database"
-	"distrodakwah_backend/app/middleware"
 	"distrodakwah_backend/app/services/controller/productcontroller"
 	"distrodakwah_backend/app/services/repository/productrepository"
 
@@ -19,19 +18,22 @@ func Init() {
 }
 
 func productAuthGroup(g *echo.Group) {
-	g.GET("", productController.Gets)
-	g.POST("", productController.Post)
-	g.PUT("/:product_id/edit", productController.UpdateProduct)
+	// g.GET("", productController.Gets)
+	// g.POST("", productController.Post)
+	// g.PUT("/:product_id/edit", productController.UpdateProduct)
 
 }
 
 func SetProductGroup(g *echo.Group) {
-	authGroup := g.Group("", middleware.AdminRoleMiddleware)
+	// authGroup := g.Group("", middleware.AdminRoleMiddleware)
 
+	g.GET("", productController.GetAllProducts)
 	// authGroup := g.Group("", middleware.CheckAuthMiddleware, middleware.AdminRoleMiddleware)
-	productAuthGroup(authGroup)
+	// productAuthGroup(authGroup)
 	g.POST("/create-product-basic-structure", productController.CreateProductBasicStructure)
 
+	// g.POST("", productController.Post)
+	// g.PUT("/:product_id/edit", productController.UpdateProduct)
 	g.GET("/generate-price-template", productController.GeneratePriceTemplate)
 	g.POST("/import-prices", productController.ImportPrices)
 

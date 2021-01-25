@@ -66,11 +66,27 @@ func (pc *ProductController) GetProductsByColumn(c echo.Context) error {
 	return c.JSON(res.Status, res)
 }
 
+func (pc *ProductController) GetAllProducts(c echo.Context) error {
+
+	productables, err := productlibrary.GetAllProducts()
+	if err != nil {
+		fmt.Println("error fetching all products")
+		return nil
+	}
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    productables,
+	}
+	return c.JSON(res.Status, res)
+
+}
+
 func (pc *ProductController) Gets(c echo.Context) error {
 	pageReq, err := strconv.Atoi(c.QueryParam("p_page"))
 	limitReq, err := strconv.Atoi(c.QueryParam("p_limit"))
-	preloadReq := c.QueryParam("preload")
-	productIDArrReq := c.QueryParam("product_id_arr")
+	// preloadReq := c.QueryParam("preload")
+	// productIDArrReq := c.QueryParam("product_id_arr")
 
 	request := &producthandler.FetchAllReq{
 		Preload:      []string{},
@@ -81,12 +97,12 @@ func (pc *ProductController) Gets(c echo.Context) error {
 		},
 	}
 
-	if preloadReq != "" {
-		err = json.NewDecoder(strings.NewReader(preloadReq)).Decode(&request.Preload)
-	}
-	if productIDArrReq != "" {
-		err = json.NewDecoder(strings.NewReader(productIDArrReq)).Decode(&request.ProductIDArr)
-	}
+	// if preloadReq != "" {
+	// 	err = json.NewDecoder(strings.NewReader(preloadReq)).Decode(&request.Preload)
+	// }
+	// if productIDArrReq != "" {
+	// 	err = json.NewDecoder(strings.NewReader(productIDArrReq)).Decode(&request.ProductIDArr)
+	// }
 
 	if err != nil {
 		fmt.Println(err)
@@ -241,7 +257,7 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 
 		for i := 1; i < rowsLen; i++ {
 			TempItemID, _ := strconv.ParseUint(rows[i][1], 10, 64)
-			tempPriceValue, _ := strconv.ParseFloat(rows[i][4], 10)
+			tempPriceValue, _ := strconv.Atoi(rows[i][4])
 			pricesXLSX = append(
 				pricesXLSX,
 				productmodel.SPItemPrice{
