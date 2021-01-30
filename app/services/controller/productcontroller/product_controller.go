@@ -63,12 +63,23 @@ func (pc *ProductController) GetProductsByColumn(c echo.Context) error {
 		Message: httphelper.StatusOKMessage,
 		Data:    data,
 	}
+
 	return c.JSON(res.Status, res)
 }
 
 func (pc *ProductController) GetAllProducts(c echo.Context) error {
+	var err error
 
-	productables, err := productlibrary.GetAllProducts()
+	pageReq, err := strconv.Atoi(c.QueryParam("p_page"))
+	limitReq, err := strconv.Atoi(c.QueryParam("p_limit"))
+
+	metadata := pagination.Metadata{
+		Page:   pageReq,
+		Limit:  limitReq,
+		Offset: (limitReq * pageReq) - limitReq,
+	}
+	productables, err := productlibrary.GetAllProducts(metadata)
+	// productlibrary.GetAllProductPricesOnly()
 	if err != nil {
 		fmt.Println("error fetching all products")
 		return nil
@@ -117,6 +128,24 @@ func (pc *ProductController) Gets(c echo.Context) error {
 	return c.JSON(res.Status, res)
 }
 
+func (ProductController) GetProductByID(c echo.Context) error {
+	var err error
+
+	productID, err := strconv.ParseUint(c.QueryParam("product_id"), 10, 64)
+	kindID, err := strconv.Atoi(c.QueryParam("kind_id"))
+	productable, err := productlibrary.GetProductByID(uint(productID), kindID)
+	if err != nil {
+		fmt.Println("error find product")
+		return c.JSON(http.StatusBadRequest, "product not found")
+	}
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    productable,
+	}
+	return c.JSON(res.Status, res)
+}
+
 func (pc *ProductController) Post(c echo.Context) error {
 
 	product := &producthandler.ProductJSONParsed{}
@@ -158,7 +187,7 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 
 	// ! Update this
 
-	productable, err := productlibrary.ConstructProduct(productReq)
+	productable, err := productlibrary.ConstructProductForAddNewProduct(productReq)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "Failed Constructing product")
 	}
@@ -168,7 +197,6 @@ func (pc *ProductController) CreateProductBasicStructure(c echo.Context) (err er
 	}
 
 	productable.SetProductImages(productImageURLs)
-
 	err = productable.SaveProduct()
 
 	if err != nil {
@@ -245,41 +273,43 @@ func (pc *ProductController) ImportPrices(c echo.Context) error {
 		return err
 	}
 
-	pricesXLSX := []productmodel.SPItemPrice{}
-
 	rows := xlsx.GetRows("Item Prices")
 	if err != nil {
 		return err
 	}
 
 	rowsLen := len(rows)
+	fmt.Printf("rowslen %+v\n", rows[1][2])
+	pricesXLSX := productlibrary.ProductDetailItemPriceArr{}
 	if rowsLen > 0 {
 
 		for i := 1; i < rowsLen; i++ {
-			TempItemID, _ := strconv.ParseUint(rows[i][1], 10, 64)
-			tempPriceValue, _ := strconv.Atoi(rows[i][4])
+			itemID, _ := strconv.ParseUint(rows[i][1], 10, 64)
+			kind, _ := strconv.ParseUint(rows[i][3], 10, 64)
+			priceValue, _ := strconv.Atoi(rows[i][5])
 			pricesXLSX = append(
 				pricesXLSX,
-				productmodel.SPItemPrice{
-					SPItemID: uint(TempItemID),
-					Name:     rows[i][3],
-					Value:    tempPriceValue,
+				productlibrary.ProductDetailItemPrice{
+					ItemID:     uint(itemID),
+					Kind:       uint(kind),
+					PriceName:  rows[i][4],
+					PriceValue: priceValue,
 				},
 			)
 
 		}
 	}
 
-	err = pc.ProductRepository.ImportPrices(pricesXLSX)
+	err = productlibrary.SaveProductPrices(pricesXLSX)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }
 
-func (pc *ProductController) GeneratePriceTemplate(c echo.Context) (err error) {
+func (pc *ProductController) GenerateProductPriceTemplate(c echo.Context) (err error) {
 	productIDArrReq := c.QueryParam("product_id_arr")
-	var productIDArr []int
+	var productIDArr []uint
 	if productIDArrReq != "" {
 		err = json.NewDecoder(strings.NewReader(productIDArrReq)).Decode(&productIDArr)
 	}
@@ -288,22 +318,24 @@ func (pc *ProductController) GeneratePriceTemplate(c echo.Context) (err error) {
 		fmt.Println(err)
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	data, err := pc.ProductRepository.GeneratePriceTemplate(productIDArr)
+	data := productlibrary.GetAllProductPricesOnly(productIDArr)
 
 	xlsx := excelize.NewFile()
 	xlsx.NewSheet("Item Prices")
-	xlsx.SetCellValue("Item Prices", "A1", "Price ID")
+	xlsx.SetCellValue("Item Prices", "A1", "Product Name")
+	// xlsx.SetCellValue("Item Prices", "B1", "Main SKU")
 	xlsx.SetCellValue("Item Prices", "B1", "Item ID")
-	xlsx.SetCellValue("Item Prices", "C1", "Item SKU")
-	xlsx.SetCellValue("Item Prices", "D1", "Price Name")
-	xlsx.SetCellValue("Item Prices", "E1", "Price Value")
+	xlsx.SetCellValue("Item Prices", "C1", "SKU")
+	xlsx.SetCellValue("Item Prices", "D1", "Kind")
+	xlsx.SetCellValue("Item Prices", "E1", "Price Name")
+	xlsx.SetCellValue("Item Prices", "F1", "Price Value")
 
 	for index, price := range data {
-		xlsx.SetCellValue("Item Prices", fmt.Sprintf("A%d", index+2), price.ID)
+		xlsx.SetCellValue("Item Prices", fmt.Sprintf("A%d", index+2), price.Name)
 		xlsx.SetCellValue("Item Prices", fmt.Sprintf("B%d", index+2), price.ItemID)
-		xlsx.SetCellValue("Item Prices", fmt.Sprintf("C%d", index+2), price.ItemSku)
-		xlsx.SetCellValue("Item Prices", fmt.Sprintf("D%d", index+2), price.Name)
-		xlsx.SetCellValue("Item Prices", fmt.Sprintf("E%d", index+2), price.Value)
+		xlsx.SetCellValue("Item Prices", fmt.Sprintf("C%d", index+2), price.Sku)
+		xlsx.SetCellValue("Item Prices", fmt.Sprintf("D%d", index+2), price.Kind)
+		// xlsx.SetCellValue("Item Prices", fmt.Sprintf("E%d", index+2), price.PriceValue)
 
 	}
 

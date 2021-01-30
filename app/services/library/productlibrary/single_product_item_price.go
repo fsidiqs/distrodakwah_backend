@@ -8,17 +8,23 @@ import (
 	"gorm.io/gorm"
 )
 
+const RetailPriceName = "retail price"
+
 type SPItemPrice struct {
 	ID       uint   `gorm:"primaryKey;autoIncrement;not null"`
-	SPItemID uint   `gorm:"column:SP_item_id"json:"sp_item_id"`
+	SPItemID uint   `gorm:"column:SP_item_id" json:"sp_item_id"`
 	Name     string `gorm:"type:varchar(255);not null" json:"name"`
 	Value    int    `json:"value"`
 }
 
-func NewSPItemRetailPrice() SPItemPrice {
+func (SPItemPrice) TableName() string {
+	return "SP_item_prices"
+}
+
+func NewSPItemRetailPrice(price int) SPItemPrice {
 	return SPItemPrice{
 		Name:  "retail price",
-		Value: 0,
+		Value: price,
 	}
 }
 

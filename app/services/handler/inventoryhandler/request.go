@@ -8,7 +8,7 @@ type Preload []string
 
 type FetchAllReq struct {
 	Preload
-	ProductIDArr []int               `json:"product_id_arr"`
-	ItemIDArr    []int               `json:"item_id_arr"`
+	ProductIDArr []uint              `json:"product_id_arr"`
+	ItemIDArr    []uint              `json:"item_id_arr"`
 	Metadata     pagination.Metadata `json:"metadata"`
 }

@@ -30,43 +30,41 @@ type SingleProductForCreate struct {
 }
 
 type SingleProduct struct {
-	ID                uint                        `gorm:"primaryKey;autoIncrement;not null"`
-	CreatedAt         time.Time                   `json:"created_at"`
-	UpdatedAt         time.Time                   `json:"updated_at"`
-	DeletedAt         sql.NullTime                `json:"deleted_at"`
-	BrandID           uint                        `json:"brand_id"`
-	CategoryID        uint                        `json:"category_id"`
-	ProductTypeID     uint8                       `json:"product_type_id"`
-	ProductKindID     uint8                       `json:"product_kind_id"`
-	Name              string                      `json:"name"`
-	Description       string                      `json:"description"`
-	Status            string                      `json:"status"`
-	ProductImages     []productmodel.ProductImage `gorm:"-" json:"product_images"`
-	SingleProductItem *SingleProductItem          `json:"single_product_item"`
+	ID                uint                 `gorm:"primaryKey;autoIncrement;not null"`
+	CreatedAt         time.Time            `json:"created_at"`
+	UpdatedAt         time.Time            `json:"updated_at"`
+	DeletedAt         gorm.DeletedAt       `gorm:"index" json:"deleted_at"`
+	BrandID           uint                 `json:"brand_id"`
+	CategoryID        uint                 `json:"category_id"`
+	ProductTypeID     uint8                `gorm:"type:INT;UNSIGNED;NOT NULL" json:"product_type_id"`
+	Name              string               `gorm:"type:varchar(255);not null" json:"name"`
+	Description       string               `gorm:"type:text;not null" json:"description"`
+	Status            string               `gorm:"type:NOT NULL;default:0" json:"status"`
+	ProductImages     []SingleProductImage `gorm:"foreignKey:SPID;references:ID" json:"single_product_images"`
+	SingleProductItem *SingleProductItem   `gorm:"foreignKey:SPID;references:ID" json:"single_product_item"`
 }
 
 func (p SingleProduct) SaveProduct() error {
 	var DB *gorm.DB = database.DB
 	var err error
 	tx := DB.Begin()
-	productImages := []productmodel.ProductImage{}
+	productImages := []productmodel.SingleProductImage{}
 	for _, productimage := range p.ProductImages {
-		productImages = append(productImages, productmodel.ProductImage{
+		productImages = append(productImages, productmodel.SingleProductImage{
 			URL: productimage.URL,
 		})
 	}
 
-	var productModel *productmodel.Product
-	productModel = &productmodel.Product{
+	var productModel *productmodel.SingleProduct
+	productModel = &productmodel.SingleProduct{
 		ProductImages: productImages,
 		BrandID:       p.BrandID,
 		CategoryID:    p.CategoryID,
-		ProductKindID: p.ProductKindID,
 		Status:        p.Status,
 		Name:          p.Name,
 		Description:   p.Description,
 	}
-	err = tx.Model(&productmodel.Product{}).Create(&productModel).Error
+	err = tx.Model(&productmodel.SingleProduct{}).Create(&productModel).Error
 
 	if err != nil {
 		fmt.Printf("error creating product \n %+v \n", err)
@@ -75,9 +73,9 @@ func (p SingleProduct) SaveProduct() error {
 	}
 
 	singleProductItem := &productmodel.SingleProductItem{
-		ProductID: productModel.ID,
-		Weight:    p.SingleProductItem.Weight,
-		Sku:       p.SingleProductItem.Sku,
+		SPID:   productModel.ID,
+		Weight: p.SingleProductItem.Weight,
+		Sku:    p.SingleProductItem.Sku,
 	}
 	err = tx.Model(&productmodel.SingleProductItem{}).Create(&singleProductItem).Error
 
@@ -89,8 +87,8 @@ func (p SingleProduct) SaveProduct() error {
 
 	SPItemPrice := &productmodel.SPItemPrice{
 		SPItemID: singleProductItem.ID,
-		Name:     "retail price",
-		Value:    0,
+		Name:     p.SingleProductItem.SPIPrices[0].Name,
+		Value:    p.SingleProductItem.SPIPrices[0].Value,
 	}
 
 	err = tx.Model(&productmodel.SPItemPrice{}).Create(&SPItemPrice).Error
@@ -116,7 +114,7 @@ func (p SingleProduct) SaveProduct() error {
 		}
 		SPIInventoryDetail := &inventorymodel.SPIInventoryDetail{
 			SPItemInventoryID: singleProductInventory.ID,
-			SubdistrictID:     SPIInventory.SPIIDetail.SubdistrictID,
+			SubdistrictID:     SPIInventory.SPIInventoryDetail.SubdistrictID,
 		}
 		err = tx.Model(&inventorymodel.SPIInventoryDetail{}).Create(&SPIInventoryDetail).Error
 		if err != nil {
@@ -128,6 +126,7 @@ func (p SingleProduct) SaveProduct() error {
 	}
 	return tx.Commit().Error
 }
+
 func (p *SingleProduct) FetchProductable() error {
 	var err error
 	var DB *gorm.DB = database.DB
@@ -153,10 +152,10 @@ func (p *SingleProduct) FetchProductable() error {
 	}
 
 	p.SingleProductItem = &SingleProductItem{
-		ProductID:    p.ID,
-		Weight:       singleProductItemDB.Weight,
-		Sku:          singleProductItemDB.Sku,
-		SPItemPrices: itemPricesDB,
+		SPID:      p.ID,
+		Weight:    singleProductItemDB.Weight,
+		Sku:       singleProductItemDB.Sku,
+		SPIPrices: itemPricesDB,
 	}
 	return nil
 }
@@ -167,11 +166,10 @@ func (p SingleProduct) GetProductable() *Product {
 		ID:            p.ID,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
-		DeletedAt:     p.DeletedAt,
+		DeletedAt:     sql.NullTime{p.DeletedAt.Time, p.DeletedAt.Valid},
 		BrandID:       p.BrandID,
 		CategoryID:    p.CategoryID,
 		ProductTypeID: p.ProductTypeID,
-		ProductKindID: p.ProductKindID,
 		Name:          p.Name,
 		Description:   p.Description,
 		Status:        p.Status,
@@ -183,7 +181,7 @@ func (p SingleProduct) GetProductable() *Product {
 func (p *SingleProduct) SetProductImages(urls []string) {
 	for _, url := range urls {
 
-		p.ProductImages = append(p.ProductImages, productmodel.ProductImage{
+		p.ProductImages = append(p.ProductImages, SingleProductImage{
 			URL: url,
 		})
 	}
@@ -195,7 +193,6 @@ func NewSingleProduct(productReqParsed producthandler.ProductJSONParsed) (*Singl
 		BrandID:       productReqParsed.BrandID,
 		CategoryID:    productReqParsed.CategoryID,
 		ProductTypeID: productReqParsed.ProductTypeID,
-		ProductKindID: productReqParsed.ProductKindID,
 		Name:          productReqParsed.Name,
 		Description:   productReqParsed.Description,
 		Status:        productReqParsed.Status,
@@ -206,5 +203,21 @@ func NewSingleProduct(productReqParsed producthandler.ProductJSONParsed) (*Singl
 		return nil, err
 	}
 	singleProduct.SingleProductItem = item
+	return singleProduct, nil
+}
+
+func GetSingleProductByID(id uint) (*SingleProduct, error) {
+	var err error
+	var DB *gorm.DB = database.DB
+	singleProduct := &SingleProduct{}
+	err = DB.Model(&SingleProduct{}).
+		Preload("ProductImages").
+		Preload("SingleProductItem.SPIPrices").
+		Preload("SingleProductItem.SPIInventories.SPIInventoryDetail").
+		Where("id = ?", id).
+		First(&singleProduct).Error
+	if err != nil {
+		return nil, err
+	}
 	return singleProduct, nil
 }

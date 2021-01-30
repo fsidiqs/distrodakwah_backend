@@ -28,13 +28,14 @@ func SetProductGroup(g *echo.Group) {
 	// authGroup := g.Group("", middleware.AdminRoleMiddleware)
 
 	g.GET("", productController.GetAllProducts)
+	g.GET("/get-product-by-id", productController.GetProductByID)
 	// authGroup := g.Group("", middleware.CheckAuthMiddleware, middleware.AdminRoleMiddleware)
 	// productAuthGroup(authGroup)
 	g.POST("/create-product-basic-structure", productController.CreateProductBasicStructure)
 
 	// g.POST("", productController.Post)
 	// g.PUT("/:product_id/edit", productController.UpdateProduct)
-	g.GET("/generate-price-template", productController.GeneratePriceTemplate)
+	g.GET("/generate-product-prices-template", productController.GenerateProductPriceTemplate)
 	g.POST("/import-prices", productController.ImportPrices)
 
 	g.GET("/brands", productController.GetBrands)

@@ -6,3 +6,7 @@ type VPItemPrice struct {
 	Name     string `gorm:"type:varchar(255);not null" json:"name"`
 	Value    int    `json:"value"`
 }
+
+func (VPItemPrice) TableName() string {
+	return "VP_item_prices"
+}

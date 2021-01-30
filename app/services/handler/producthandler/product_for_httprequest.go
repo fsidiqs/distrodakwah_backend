@@ -33,13 +33,13 @@ type ProductJSONParsed struct {
 }
 
 type ItemCreateBasicProduct struct {
-	ID             int     `gorm:"primaryKey;autoIncrement;not null"`
-	ProductID      int     `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
-	Sku            string  `json:"sku"`
-	Price          float64 `json:"retail_price"`
-	Weight         int     `json:"weight"`
-	SubdistrictIDs string  `json:"subdistrict_ids"`
-	Options        string  `json:"options"`
+	ID             int    `gorm:"primaryKey;autoIncrement;not null"`
+	ProductID      int    `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"product_id"`
+	Sku            string `json:"sku"`
+	Price          int    `json:"retail_price"`
+	Weight         int    `json:"weight"`
+	SubdistrictIDs string `json:"subdistrict_ids"`
+	Options        string `json:"options"`
 }
 
 type ItemInventoryRequestCreateBasicProduct struct {

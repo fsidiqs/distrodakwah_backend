@@ -3,8 +3,8 @@ package inventorymodel
 import "time"
 
 type VPIInventoryAdjustment struct {
-	ID             int       `gorm:"primaryKey;autoIncrement;not null"`
-	VPIInventoryID int       `gorm:"column:VPI_inventory_id;type:BIGINT;UNSIGNED;NOT NULL" json:"item_inventory_id"`
+	ID             uint      `gorm:"primaryKey;autoIncrement;not null"`
+	VPIInventoryID uint      `gorm:"column:VPI_inventory_id;type:BIGINT;UNSIGNED;NOT NULL" json:"item_inventory_id"`
 	UserID         int       `gorm:"type:BIGINT;UNSIGNED;NOT NULL" json:"user_id"`
 	StockBefore    int       `gorm:"type:INT;NOT NULL" json:"stock_before"`
 	StockAfter     int       `gorm:"type:INT;NOT NULL" json:"stock_after"`

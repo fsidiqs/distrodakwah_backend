@@ -9,13 +9,13 @@ type Variant struct {
 	Name string `json:"name"`
 }
 
-func NewVariantProductVariant(variantReqJson string) ([]VPVariant, error) {
+func NewVariantProductVariant(variantReqJson string) ([]VariantProductVariant, error) {
 	variantReqs := []string{}
 	err := json.NewDecoder(strings.NewReader(variantReqJson)).Decode(&variantReqs)
 	if err != nil {
 		return nil, err
 	}
-	vpVariants := make([]VPVariant, len(variantReqs))
+	vpVariants := make([]VariantProductVariant, len(variantReqs))
 	for i, variantReq := range variantReqs {
 		vpVariants[i].Name = variantReq
 	}

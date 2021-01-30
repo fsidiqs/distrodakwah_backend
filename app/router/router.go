@@ -25,7 +25,7 @@ func Init() *echo.Echo {
 	productGroup := e.Group("/products")
 	product.SetProductGroup(productGroup)
 
-	InventoryGroup := e.Group("/inventory")
+	InventoryGroup := e.Group("/inventories")
 	SetInventoryGroup(InventoryGroup)
 
 	orderGroup := e.Group("/orders")

@@ -8,13 +8,17 @@ import (
 )
 
 type VariantProductItem struct {
-	ID                    uint                            `json:"id"`
-	ProductID             uint                            `json:"product_id"`
-	VariantProductOptions []VPOption                      `gorm:"-" json:"variant_product_options"`
-	Weight                int                             `json:"weight"`
-	Sku                   string                          `json:"sku"`
-	VPIInventories        []inventorylibrary.VPIInventory `gorm:"-" json:"VPIInventory"`
-	VPItemPrices          []VPItemPrice                   `gorm:"-"`
+	ID                    uint                            `gorm:"primaryKey;autoIncrement;not null"`
+	VPID                  uint                            `gorm:"column:VP_id;type:BIGINT;UNSIGNED;NOT NULL" json:"variant_product_id"`
+	Weight                int                             `gorm:"type:INT;UNSIGNED;NOT NULL" json:"weight"`
+	Sku                   string                          `gorm:"type:varchar(255);not null" json:"sku"`
+	VariantProductOptions []VariantProductOption          `gorm:"foreignKey:VPItemID;references:ID" json:"variant_product_options"`
+	VPIInventories        []inventorylibrary.VPIInventory `gorm:"foreignKey:VP_item_id" json:"variant_product_item_inventories"`
+	VPItemPrices          []VPItemPrice                   `gorm:"foreignKey:VPItemID;references:ID" json:"variant_product_item_prices"`
+}
+
+func (VariantProductItem) TableName() string {
+	return "VP_items"
 }
 
 func NewVariantProductItem(itemReqJson string) ([]VariantProductItem, error) {
@@ -35,9 +39,9 @@ func NewVariantProductItem(itemReqJson string) ([]VariantProductItem, error) {
 		if err != nil {
 			return nil, err
 		}
-		vpOptions := make([]VPOption, len(options))
+		vpOptions := make([]VariantProductOption, len(options))
 		for i, option := range options {
-			vpOptions[i] = VPOption{
+			vpOptions[i] = VariantProductOption{
 				Name: option,
 			}
 		}
@@ -48,6 +52,12 @@ func NewVariantProductItem(itemReqJson string) ([]VariantProductItem, error) {
 			Sku:                   itemReq.Sku,
 			VariantProductOptions: vpOptions,
 			VPIInventories:        VPIInventories,
+			VPItemPrices: []VPItemPrice{
+				VPItemPrice{
+					Name:  RetailPriceName,
+					Value: itemReq.Price,
+				},
+			},
 		}
 
 	}

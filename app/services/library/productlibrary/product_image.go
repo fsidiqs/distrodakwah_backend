@@ -1,11 +1,7 @@
 package productlibrary
 
 import (
-	"distrodakwah_backend/app/services/model/productmodel"
-	"fmt"
 	"mime/multipart"
-
-	"gorm.io/gorm"
 )
 
 type ProductImageUrl string
@@ -32,14 +28,14 @@ type ProductImage struct {
 // 	return productImageUrls, nil
 // }
 
-func SaveImagesTx(productImages []productmodel.ProductImage, tx *gorm.DB) error {
+// func SaveImagesTx(productImages []productmodel.ProductImage, tx *gorm.DB) error {
 
-	err := tx.Model(&productmodel.ProductImage{}).Create(&productImages).Error
+// 	err := tx.Model(&productmodel.ProductImage{}).Create(&productImages).Error
 
-	if err != nil {
-		fmt.Printf("error creating images\n %+v \n", err)
-		tx.Rollback()
-		return err
-	}
-	return nil
-}
+// 	if err != nil {
+// 		fmt.Printf("error creating images\n %+v \n", err)
+// 		tx.Rollback()
+// 		return err
+// 	}
+// 	return nil
+// }

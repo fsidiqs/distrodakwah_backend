@@ -14,9 +14,8 @@ import (
 	"distrodakwah_backend/app/helper/excelizelib"
 	"distrodakwah_backend/app/helper/httphelper"
 	"distrodakwah_backend/app/helper/pagination"
-	"distrodakwah_backend/app/middleware"
 	"distrodakwah_backend/app/services/handler/inventoryhandler"
-	"distrodakwah_backend/app/services/library/inventorylibrary"
+	"distrodakwah_backend/app/services/library/productlibrary"
 	"distrodakwah_backend/app/services/repository/inventoryrepository"
 )
 
@@ -33,8 +32,8 @@ func (ic *InventoryController) GetProductStocks(c echo.Context) error {
 
 	request := inventoryhandler.FetchAllReq{
 		Preload:      []string{},
-		ProductIDArr: []int{},
-		ItemIDArr:    []int{},
+		ProductIDArr: []uint{},
+		ItemIDArr:    []uint{},
 		Metadata: pagination.Metadata{
 			Page:  pageReq,
 			Limit: limitReq,
@@ -89,12 +88,24 @@ func (ic *InventoryController) GetProductStock(c echo.Context) error {
 }
 
 func (ic *InventoryController) ExportStocks(c echo.Context) error {
-	data, err := ic.InventoryRepository.ExportInventory()
+	var err error
+	productIDArrReq := c.QueryParam("product_id_arr")
+	var productIDArr []uint
+	if productIDArrReq != "" {
+		err = json.NewDecoder(strings.NewReader(productIDArrReq)).Decode(&productIDArr)
+	}
+
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	// data, err := ic.InventoryRepository.ExportInventory()
+	data, err := productlibrary.GetAllProductStocks(productIDArr)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, httphelper.BadRequestMessage)
 	}
-	b, err := excelizelib.PopulateXLSX(data)
+	b, err := productlibrary.PopulateProductStockXLSX(data)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -110,7 +121,7 @@ func (ic *InventoryController) ExportStocks(c echo.Context) error {
 }
 
 func (ic *InventoryController) ImportStocks(c echo.Context) error {
-	userContext := c.(*middleware.UserContext)
+	// userContext := c.(*middleware.UserContext)
 	form, err := c.MultipartForm()
 	files := form.File["stocks_file"]
 	if err != nil {
@@ -146,7 +157,7 @@ func (ic *InventoryController) ImportStocks(c echo.Context) error {
 		return err
 	}
 
-	stockTempl := []inventorylibrary.ItemInventoryXlsx{}
+	stockTempl := []productlibrary.ProductStock{}
 	rows := xlsx.GetRows(excelizelib.Sheetname)
 	if err != nil {
 		return err
@@ -156,21 +167,24 @@ func (ic *InventoryController) ImportStocks(c echo.Context) error {
 	if rowsLen > 0 {
 		for currRow := excelizelib.RowReadStart; currRow < rowsLen; currRow++ {
 
-			ID, _ := strconv.ParseUint(rows[currRow][0], 10, 64)
-			stock, _ := strconv.ParseInt(rows[currRow][5], 10, 32)
-			keep, _ := strconv.ParseInt(rows[currRow][6], 10, 32)
+			ID, _ := strconv.ParseUint(rows[currRow][1], 10, 64)
+			kind, _ := strconv.ParseUint(rows[currRow][3], 10, 64)
+
+			stock, _ := strconv.ParseInt(rows[currRow][4], 10, 32)
 
 			stockTempl = append(
 				stockTempl,
-				inventorylibrary.ItemInventoryXlsx{
-					ID:    int(ID),
-					Stock: int(stock),
-					Keep:  int(keep),
+				productlibrary.ProductStock{
+					ItemInventoryID: uint(ID),
+					Kind:            uint(kind),
+					Stock:           int(stock),
 				},
 			)
 		}
 	}
+	//! user context must login
+	// err = productlibrary.SaveProductStocks(stockTempl, userContext.User.ID)
+	err = productlibrary.SaveProductStocks(stockTempl, 1)
 
-	err = ic.InventoryRepository.PerformInventoryUpdate(stockTempl, userContext.User.ID)
 	return c.JSON(http.StatusOK, httphelper.StatusOKMessage)
 }

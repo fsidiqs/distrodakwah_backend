@@ -13,20 +13,19 @@ import (
 )
 
 type VariantProduct struct {
-	ID                  uint                        `gorm:"primaryKey;autoIncrement;not null"`
-	CreatedAt           time.Time                   `json:"created_at"`
-	UpdatedAt           time.Time                   `json:"updated_at"`
-	DeletedAt           sql.NullTime                `json:"deleted_at"`
-	BrandID             uint                        `json:"brand_id"`
-	CategoryID          uint                        `json:"category_id"`
-	ProductTypeID       uint8                       `json:"product_type_id"`
-	ProductKindID       uint8                       `json:"product_kind_id"`
-	Name                string                      `json:"name"`
-	Description         string                      `json:"description"`
-	Status              string                      `json:"status"`
-	ProductImages       []productmodel.ProductImage `gorm:"-" json:"product_images"`
-	VariantProductItems []VariantProductItem        `json:"variant_product_item"`
-	VPVariants          []VPVariant                 `json:"variant_products"`
+	ID                     uint                    `gorm:"primaryKey;autoIncrement;not null"`
+	CreatedAt              time.Time               `json:"created_at"`
+	UpdatedAt              time.Time               `json:"updated_at"`
+	DeletedAt              sql.NullTime            `json:"deleted_at"`
+	BrandID                uint                    `json:"brand_id"`
+	CategoryID             uint                    `json:"category_id"`
+	ProductTypeID          uint8                   `json:"product_type_id"`
+	Name                   string                  `json:"name"`
+	Description            string                  `json:"description"`
+	Status                 string                  `json:"status"`
+	ProductImages          []VariantProductImage   `gorm:"foreignKey:VPID;references:ID" json:"variant_product_images"`
+	VariantProductItems    []VariantProductItem    `gorm:"foreignKey:VPID;references:ID" json:"variant_product_items"`
+	VariantProductVariants []VariantProductVariant `gorm:"foreignKey:VPID;references:ID" json:"variant_product_variants"`
 }
 
 func (p VariantProduct) SaveProduct() error {
@@ -35,30 +34,29 @@ func (p VariantProduct) SaveProduct() error {
 	var err error
 	tx := DB.Begin()
 
-	productModel := &productmodel.Product{
-		BrandID:       p.BrandID,
-		CategoryID:    p.CategoryID,
-		ProductKindID: p.ProductKindID,
-		Status:        p.Status,
-		Name:          p.Name,
-		Description:   p.Description,
+	productModel := &productmodel.VariantProduct{
+		BrandID:     p.BrandID,
+		CategoryID:  p.CategoryID,
+		Status:      p.Status,
+		Name:        p.Name,
+		Description: p.Description,
 	}
-	err = tx.Model(&productmodel.Product{}).Create(&productModel).Error
+	err = tx.Model(&productmodel.VariantProduct{}).Create(&productModel).Error
 	if err != nil {
 		fmt.Printf("error creating product \n %+v \n", err)
 		tx.Rollback()
 		return nil
 	}
 
-	productImagesModel := []productmodel.ProductImage{}
+	productImagesModel := []productmodel.VariantProductImage{}
 	for _, productImage := range p.ProductImages {
-		productImagesModel = append(productImagesModel, productmodel.ProductImage{
-			ProductID: productModel.ID,
-			URL:       productImage.URL,
+		productImagesModel = append(productImagesModel, productmodel.VariantProductImage{
+			VPID: productModel.ID,
+			URL:  productImage.URL,
 		})
 	}
 
-	err = tx.Model(&productmodel.ProductImage{}).Create(&productImagesModel).Error
+	err = tx.Model(&productmodel.VariantProductImage{}).Create(&productImagesModel).Error
 
 	if err != nil {
 		fmt.Printf("error creating image \n %+v \n", err)
@@ -67,10 +65,10 @@ func (p VariantProduct) SaveProduct() error {
 	}
 
 	variantProductVariants := []productmodel.VariantProductVariant{}
-	for _, variantProduct := range p.VPVariants {
+	for _, variantProduct := range p.VariantProductVariants {
 		variantProductVariants = append(variantProductVariants, productmodel.VariantProductVariant{
-			ProductID: productModel.ID,
-			Name:      variantProduct.Name,
+			VPID: productModel.ID,
+			Name: variantProduct.Name,
 		})
 	}
 	err = tx.Model(&productmodel.VariantProductVariant{}).Create(&variantProductVariants).Error
@@ -82,9 +80,9 @@ func (p VariantProduct) SaveProduct() error {
 	// item variant product items loop
 	for _, item := range p.VariantProductItems {
 		variantProductItem := productmodel.VariantProductItem{
-			ProductID: productModel.ID,
-			Weight:    item.Weight,
-			Sku:       item.Sku,
+			VPID:   productModel.ID,
+			Weight: item.Weight,
+			Sku:    item.Sku,
 		}
 
 		err = tx.Model(&productmodel.VariantProductItem{}).Create(&variantProductItem).Error
@@ -98,9 +96,9 @@ func (p VariantProduct) SaveProduct() error {
 		// assume total option count = total variant count, and the order is same aswell
 		for i, vpOption := range item.VariantProductOptions {
 			vpOptions = append(vpOptions, productmodel.VariantProductOption{
-				VariantProductVariantID: variantProductVariants[i].ID,
-				VariantProductItemID:    variantProductItem.ID,
-				Name:                    vpOption.Name,
+				VPVariantID: variantProductVariants[i].ID,
+				VPItemID:    variantProductItem.ID,
+				Name:        vpOption.Name,
 			})
 		}
 		err = tx.Model(&productmodel.VariantProductOption{}).Create(&vpOptions).Error
@@ -112,8 +110,8 @@ func (p VariantProduct) SaveProduct() error {
 		// retail price create
 		VPItemPrice := &productmodel.VPItemPrice{
 			VPItemID: variantProductItem.ID,
-			Name:     "retail price",
-			Value:    0,
+			Name:     item.VPItemPrices[0].Name,
+			Value:    item.VPItemPrices[0].Value,
 		}
 
 		err = tx.Model(&productmodel.VPItemPrice{}).Create(&VPItemPrice).Error
@@ -140,7 +138,7 @@ func (p VariantProduct) SaveProduct() error {
 			}
 			VPIInventoryDetail := &inventorymodel.VPIInventoryDetail{
 				VPItemInventoryID: variantProductInventory.ID,
-				SubdistrictID:     VPIInventory.VPIIDetail.SubdistrictID,
+				SubdistrictID:     VPIInventory.VPIInventoryDetail.SubdistrictID,
 			}
 			err = tx.Model(&inventorymodel.VPIInventoryDetail{}).Create(&VPIInventoryDetail).Error
 			if err != nil {
@@ -161,7 +159,7 @@ func (p VariantProduct) SaveProduct() error {
 func (p *VariantProduct) FetchProductable() error {
 	var err error
 	var DB *gorm.DB = database.DB
-	vpVariants := []VPVariant{}
+	vpVariants := []VariantProductVariant{}
 	err = DB.Model(&productmodel.VariantProductVariant{}).
 		Where("product_id = ?", p.ID).
 		Find(&vpVariants).Error
@@ -187,14 +185,14 @@ func (p *VariantProduct) FetchProductable() error {
 			fmt.Println("fetching fetching prices")
 			return nil
 		}
-		itemOptionsDB := []VPOption{}
+		itemOptionsDB := []VariantProductOption{}
 		err = DB.Model(&productmodel.VariantProductOption{}).
 			Where("VP_item_id = ?", itemDB.ID).
 			Find(&itemOptionsDB).Error
 
 		variantProductItems[j] = VariantProductItem{
-			ID:        variantProductItemDBs[j].ID,
-			ProductID: variantProductItemDBs[j].ProductID,
+			ID:   variantProductItemDBs[j].ID,
+			VPID: variantProductItemDBs[j].VPID,
 			// VariantProductOptions: variantProductItemDBs[j].VariantProductOptions,
 			Weight:                variantProductItemDBs[j].Weight,
 			Sku:                   variantProductItemDBs[j].Sku,
@@ -202,7 +200,7 @@ func (p *VariantProduct) FetchProductable() error {
 			VPItemPrices:          itemPricesDB,
 		}
 	}
-	p.VPVariants = vpVariants
+	p.VariantProductVariants = vpVariants
 	p.VariantProductItems = variantProductItems
 	return nil
 }
@@ -216,7 +214,6 @@ func (p VariantProduct) GetProductable() *Product {
 		BrandID:       p.BrandID,
 		CategoryID:    p.CategoryID,
 		ProductTypeID: p.ProductTypeID,
-		ProductKindID: p.ProductKindID,
 		Name:          p.Name,
 		Description:   p.Description,
 		Status:        p.Status,
@@ -228,7 +225,7 @@ func (p VariantProduct) GetProductable() *Product {
 func (p *VariantProduct) SetProductImages(urls []string) {
 	for _, url := range urls {
 
-		p.ProductImages = append(p.ProductImages, productmodel.ProductImage{
+		p.ProductImages = append(p.ProductImages, VariantProductImage{
 			URL: url,
 		})
 	}
@@ -239,7 +236,6 @@ func NewVariantProduct(productReqParsed producthandler.ProductJSONParsed) (*Vari
 		BrandID:       productReqParsed.BrandID,
 		CategoryID:    productReqParsed.CategoryID,
 		ProductTypeID: productReqParsed.ProductTypeID,
-		ProductKindID: productReqParsed.ProductKindID,
 		Name:          productReqParsed.Name,
 		Description:   productReqParsed.Description,
 		Status:        productReqParsed.Status,
@@ -254,8 +250,26 @@ func NewVariantProduct(productReqParsed producthandler.ProductJSONParsed) (*Vari
 	if err != nil {
 		return nil, err
 	}
-	variantProduct.VPVariants = variants
+	variantProduct.VariantProductVariants = variants
 	variantProduct.VariantProductItems = items
 
+	return variantProduct, nil
+}
+
+func GetVariantProductByID(id uint) (*VariantProduct, error) {
+	var err error
+	var DB *gorm.DB = database.DB
+	variantProduct := &VariantProduct{}
+	err = DB.Model(&VariantProduct{}).
+		Preload("ProductImages").
+		Preload("VariantProductItems.VPItemPrices").
+		Preload("VariantProductItems.VPIInventories.VPIInventoryDetail").
+		Preload("VariantProductItems.VariantProductOptions").
+		Preload("VariantProductVariants.VariantProductOptions").
+		Where("id = ?", id).
+		First(&variantProduct).Error
+	if err != nil {
+		return nil, err
+	}
 	return variantProduct, nil
 }

@@ -1,6 +1,7 @@
 package productrepository
 
 import (
+	"distrodakwah_backend/app/services/library/productlibrary"
 	"distrodakwah_backend/app/services/model/productmodel"
 	"distrodakwah_backend/app/services/model/productmodel/productauxmodel"
 
@@ -41,7 +42,7 @@ func (r *ProductRepository) GeneratePriceTemplate(productIDArr []int) (productau
 	// return priceXlsx, nil
 }
 
-func (r *ProductRepository) ImportPrices(itemPriceArrReq []productmodel.SPItemPrice) error {
+func (r *ProductRepository) ImportPrices(itemPriceArrReq []productlibrary.ProductDetailItemPrice) error {
 	return nil
 	// 	var err error
 	// 	tx := r.DB.Begin()
