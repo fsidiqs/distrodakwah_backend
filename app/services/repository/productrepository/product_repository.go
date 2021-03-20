@@ -5,6 +5,8 @@ import (
 
 	"distrodakwah_backend/app/helper/pagination"
 	"distrodakwah_backend/app/services/handler/producthandler"
+	"distrodakwah_backend/app/services/library/productlibrary"
+	"distrodakwah_backend/app/services/library/query/productquery"
 	"distrodakwah_backend/app/services/model/productmodel"
 
 	"gorm.io/gorm"
@@ -36,7 +38,7 @@ func (r *ProductRepository) FetchByColumns(req *producthandler.FetchByColumnReq)
 
 	// query
 
-	res.paginate(req.Metadata)
+	// res.paginate(req.Metadata)
 	if req.Preload != nil { // check whether slice is empty
 		HandlePreload(query, &req.Preload)
 	}
@@ -83,7 +85,7 @@ func (r *ProductRepository) FetchAll(req *producthandler.FetchAllReq) (*Paginati
 
 	// query
 
-	res.paginate(req.Metadata)
+	// res.paginate(req.Metadata)
 	if req.Preload != nil { // check whether slice is empty
 		HandlePreload(query, &req.Preload)
 	}
@@ -105,189 +107,91 @@ func (r *ProductRepository) FetchAll(req *producthandler.FetchAllReq) (*Paginati
 	return res, nil
 }
 
-func (p *Pagination) paginate(m pagination.Metadata) {
+func (r *ProductRepository) FetchByItemInventoryID(InventoryItemID [][]int) ([]interface{}, error) {
+	var err error
+	SPIInvIDs := InventoryItemID[0]
+	VPIInvIDs := InventoryItemID[1]
 
-	page, limit, offset := pagination.BuildPagination(m)
-	p.Metadata = pagination.Metadata{
-		Total:  p.Metadata.Total,
-		Limit:  limit,
-		Offset: offset,
-		Page:   page,
-		Pages:  pagination.BuildPages(p.Metadata.Total, limit),
+	SPIInventories := []productlibrary.SPIInventory{}
+	VPIInventories := []productlibrary.VPIInventory{}
+
+	err = r.DB.Raw(productquery.SEL_SP_BY_ITEM_INVENTORY_ID, SPIInvIDs).
+		Preload("SingleProductItem.SingleProduct.ProductImages").
+		Find(&SPIInventories).
+		Error
+
+	if err != nil {
+		fmt.Println("error fetching sp products")
+		return nil, err
 	}
+
+	err = r.DB.Raw(productquery.SEL_VP_BY_ITEM_INVENTORY_ID, VPIInvIDs).
+		Preload("VPItem.VariantProduct.ProductImages").
+		Find(&VPIInventories).
+		Error
+
+	if err != nil {
+		fmt.Println("error fetching sp products")
+		return nil, err
+	}
+	var productResponseable []interface{}
+
+	for _, sp := range SPIInventories {
+
+		productResponseable = append(productResponseable, sp)
+	}
+	for _, vp := range VPIInventories {
+
+		productResponseable = append(productResponseable, vp)
+	}
+
+	return productResponseable, nil
 }
 
-// func (r *ProductRepository) SaveProductBasicStructure(productReqJSON *producthandler.ProductJSONParsed) error {
+func (r *ProductRepository) FetchByItemID(ItemIDArr [][]int) ([]interface{}, error) {
+	fmt.Printf("test")
 
-// 	var err error
-// 	tx := r.DB.Begin()
-// 	productImagesReq := productReqJSON.ProductImages
-// 	// convert product image request array into db like struct
+	var err error
+	SPItemIDs := ItemIDArr[0]
+	VPItemIDs := ItemIDArr[1]
 
-// 	//  STEP create product image
-// 	// err = productImagesReq.Validate()
-// 	// if err != nil {
-// 	// 	fmt.Println("product images are invalid")
-// 	// 	return err
-// 	// }
-// 	err = tx.Model(&productmodel.ProductImage{}).Create(&productImagesReq).Error
-// 	if err != nil {
-// 		fmt.Printf("error creating product_images\n %+v \n", err)
-// 		tx.Rollback()
-// 		return err
-// 	}
+	SPIInventories := []productlibrary.SingleProductItem{}
+	VPIInventories := []productlibrary.VariantProductItem{}
 
-// 	// STEP Create Product and prepare returned result
-// 	productRes := &productmodel.Product{
-// 		BrandID:       productReqJSON.BrandID,
-// 		CategoryID:    productReqJSON.CategoryID,
-// 		ProductTypeID: productReqJSON.ProductTypeID,
-// 		ProductKindID: productReqJSON.ProductKindID,
-// 		Status:        productReqJSON.Status,
-// 		Name:          productReqJSON.Name,
-// 		Description:   productReqJSON.Description,
-// 	}
+	err = r.DB.Raw(productquery.SEL_SP_BY_ITEM_ID, SPItemIDs).
+		Preload("SingleProduct.ProductImages").
+		Preload("SPIPrices").
+		Find(&SPIInventories).
+		Error
 
-// 	err = tx.Model(&productmodel.Product{}).Create(&productRes).Error
+	if err != nil {
+		fmt.Println("error fetching sp products")
+		return nil, err
+	}
 
-// 	if err != nil {
-// 		fmt.Printf("error creating product \n %+v \n", err)
-// 		tx.Rollback()
-// 		return nil
-// 	}
+	err = r.DB.Raw(productquery.SEL_VP_BY_ITEM_ID, VPItemIDs).
+		Preload("VariantProduct.ProductImages").
+		Preload("VariantProductOptions.VariantProductVariant").
+		Preload("VPItemPrices").
+		Find(&VPIInventories).
+		Error
 
-// 	//  Create ProductsProductImages
+	if err != nil {
+		fmt.Println("error fetching sp products")
+		return nil, err
+	}
 
-// 	var productsProductImages []productmodel.ProductsProductImage
-// 	for _, pi := range productImagesReq {
-// 		productsProductImages = append(
-// 			productsProductImages,
-// 			productmodel.ProductsProductImage{
-// 				ProductID:      productRes.ID,
-// 				ProductImageID: pi.ID,
-// 			},
-// 		)
-// 	}
+	var productResponseable []interface{}
+	for _, sp := range SPIInventories {
 
-// 	err = tx.Model(&productmodel.ProductsProductImage{}).Create(&productsProductImages).Error
-// 	if err != nil {
-// 		fmt.Printf("error creating ProductsProductImages\n %+v \n", err)
-// 		tx.Rollback()
-// 		return err
-// 	}
-// 	// STEP of creating Items
-// 	itemReqs := []producthandler.ItemCreateBasicProduct{}
-// 	err = json.NewDecoder(strings.NewReader(productReqJSON.Items)).Decode(&itemReqs)
+		productResponseable = append(productResponseable, sp)
+	}
+	for _, vp := range VPIInventories {
 
-// 	items := []productmodel.Item{}
-// 	// variant or single
-// 	if productReqJSON.ProductKindID == productmodel.ProductKindVariant {
-// 		variantCreateReqs := []*productmodel.Variant{}
-// 		err = json.NewDecoder(strings.NewReader(productReqJSON.Variants)).Decode(&variantCreateReqs)
-// 		for _, v := range variantCreateReqs {
-// 			v.ProductID = productRes.ID
-// 		}
-// 		err = tx.Model(&productmodel.Variant{}).Create(&variantCreateReqs).Error
-
-// 		if err != nil {
-// 			fmt.Println("product creating variants")
-// 			return err
-// 		}
-
-// 		for idx, itemReq := range itemReqs {
-// 			// STEP of creating options
-// 			optionCreateReqs := []productmodel.Option{}
-// 			err = json.NewDecoder(strings.NewReader(itemReq.Options)).Decode(&optionCreateReqs)
-
-// 			// populate option itemID
-// 			for i := 0; i < len(optionCreateReqs); i++ {
-// 				optionCreateReqs[i].VariantID = variantCreateReqs[idx].ID
-// 			}
-
-// 			// prepare item inventory
-// 			itemInventoryReqslice := []producthandler.ItemInventoryRequestCreateBasicProduct{}
-// 			err = json.NewDecoder(strings.NewReader(itemReq.ItemInventories)).Decode(&itemInventoryReqslice)
-
-// 			itemInventory := []inventorymodel.ItemInventory{}
-// 			for _, itemInventoryReq := range itemInventoryReqslice {
-// 				itemInventory = append(
-// 					itemInventory,
-// 					inventorymodel.ItemInventory{
-// 						ItemInventoryDetail: &inventorymodel.ItemInventoryDetail{
-// 							SubdistrictID: itemInventoryReq.SubdistrictID,
-// 						},
-// 					},
-// 				)
-// 			}
-
-// 			items = append(items,
-// 				productmodel.Item{
-// 					ProductID: productRes.ID,
-// 					Weight:    itemReq.Weight,
-// 					Sku:       itemReq.Sku,
-// 					Options:   optionCreateReqs,
-// 					Prices: []productmodel.ItemPrice{
-// 						{
-// 							Name:  producthandler.RetailPriceName,
-// 							Value: itemReq.Price,
-// 						},
-// 					},
-// 					// ItemInventory: itemInventory,
-// 				},
-// 			)
-
-// 		}
-
-// 	} else if productReqJSON.ProductKindID == productmodel.ProductKindSingle {
-// 		for _, itemReq := range itemReqs {
-// 			// prepare item inventory
-// 			itemInventoryReqslice := []producthandler.ItemInventoryRequestCreateBasicProduct{}
-// 			err = json.NewDecoder(strings.NewReader(itemReq.ItemInventories)).Decode(&itemInventoryReqslice)
-
-// 			// loop itemreq
-// 			itemInventory := []inventorymodel.ItemInventory{}
-// 			for _, itemInventoryReq := range itemInventoryReqslice {
-// 				itemInventory = append(
-// 					itemInventory,
-// 					inventorymodel.ItemInventory{
-// 						ItemInventoryDetail: &inventorymodel.ItemInventoryDetail{
-// 							SubdistrictID: itemInventoryReq.SubdistrictID,
-// 						},
-// 					},
-// 				)
-// 			}
-
-// 			items = append(
-// 				items,
-// 				productmodel.Item{
-// 					ProductID: productRes.ID,
-// 					Sku:       itemReq.Sku,
-// 					Weight:    itemReq.Weight,
-// 					Prices: []productmodel.ItemPrice{
-// 						{
-// 							Name:  producthandler.RetailPriceName,
-// 							Value: itemReq.Price,
-// 						},
-// 					},
-// 					// ItemInventory: itemInventory,
-// 				},
-// 			)
-// 		}
-
-// 	}
-
-// 	err = tx.Model(&productmodel.Item{}).Create(&items).Error
-
-// 	if err != nil {
-// 		fmt.Printf("Error Creating Product \n %+v \n", err)
-// 		tx.Rollback()
-// 		return err
-// 	}
-
-// 	// STEP creating iteminventory
-
-// 	return tx.Commit().Error
-// }
+		productResponseable = append(productResponseable, vp)
+	}
+	return productResponseable, nil
+}
 
 func (r ProductRepository) TxUpdateProduct(tx *gorm.DB, productReq productmodel.Product) (*gorm.DB, error) {
 	var err error

@@ -2,7 +2,7 @@ package inventorycontroller
 
 import (
 	"distrodakwah_backend/app/helper/httphelper"
-	"distrodakwah_backend/app/services/library/inventorylibrary"
+	"distrodakwah_backend/app/services/library/productlibrary"
 	"net/http"
 	"strconv"
 
@@ -10,7 +10,7 @@ import (
 )
 
 func (ic *InventoryController) GetProvinces(c echo.Context) error {
-	provinces, err := inventorylibrary.GetProvinces()
+	provinces, err := productlibrary.GetProvinces()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -25,7 +25,7 @@ func (ic *InventoryController) GetProvinces(c echo.Context) error {
 func (ic *InventoryController) GetCitiesByProvinceID(c echo.Context) error {
 	provinceIDStr := c.Param("province_id")
 	provinceID, _ := strconv.Atoi(provinceIDStr)
-	provinces, err := inventorylibrary.GetCitiesByProvinceID(provinceID)
+	provinces, err := productlibrary.GetCitiesByProvinceID(provinceID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -40,7 +40,7 @@ func (ic *InventoryController) GetCitiesByProvinceID(c echo.Context) error {
 func (ic *InventoryController) GetSubsByCityID(c echo.Context) error {
 	CityIDStr := c.Param("city_id")
 	CityID, _ := strconv.Atoi(CityIDStr)
-	cities, err := inventorylibrary.GetSubdistrictsByCityID(CityID)
+	cities, err := productlibrary.GetSubdistrictsByCityID(CityID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

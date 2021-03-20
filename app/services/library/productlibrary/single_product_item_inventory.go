@@ -1,4 +1,4 @@
-package inventorylibrary
+package productlibrary
 
 import (
 	"distrodakwah_backend/app/database"
@@ -9,18 +9,20 @@ import (
 	"gorm.io/gorm"
 )
 
-type VPIInventory struct {
+type SPIInventory struct {
 	ID                 uint                `gorm:"primaryKey;autoIncrement;not null"`
-	VPItemID           uint                `gorm:"column:VP_item_id;type:BIGINT;UNSIGNED;NOT NULL" json:"vp_item_id"`
+	SPItemID           uint                `gorm:"column:SP_item_id;type:BIGINT;UNSIGNED;NOT NULL" json:"sp_item_id"`
+	SingleProductItem  *SingleProductItem  `gorm:"foreignKey:SPItemID" json:"single_product_item"`
 	Stock              int                 `gorm:"type:INT;NOT NULL" json:"stock"`
 	Keep               int                 `gorm:"type:INT;NOT NULL" json:"keep"`
-	VPIInventoryDetail *VPIInventoryDetail `gorm:"foreignKey:VPItemInventoryID" json:"item_inventory_detail"`
+	SPIInventoryDetail *SPIInventoryDetail `gorm:"foreignKey:SPItemInventoryID" json:"item_inventory_detail"`
 }
 
-func (VPIInventory) TableName() string {
-	return "VP_item_inventories"
+func (SPIInventory) TableName() string {
+	return "SP_item_inventories"
 }
-func NewVPIInventory(jsonReq string) ([]VPIInventory, error) {
+
+func NewSPIInventory(jsonReq string) ([]SPIInventory, error) {
 	// contains slice of subdistrict id
 	parsedReq := []int{}
 
@@ -30,19 +32,19 @@ func NewVPIInventory(jsonReq string) ([]VPIInventory, error) {
 		return nil, err
 	}
 
-	VPIInventories := make([]VPIInventory, len(parsedReq))
+	SPIInventories := make([]SPIInventory, len(parsedReq))
 	for i, subdistrictID := range parsedReq {
-		VPIInventories[i] = VPIInventory{
-			VPIInventoryDetail: &VPIInventoryDetail{
+		SPIInventories[i] = SPIInventory{
+			SPIInventoryDetail: &SPIInventoryDetail{
 				SubdistrictID: subdistrictID,
 			},
 		}
 	}
 
-	return VPIInventories, nil
+	return SPIInventories, nil
 }
 
-func UpdateVPItemStock(spiIntenvories []inventorymodel.VPIInventory, userID int) error {
+func UpdateSPItemStock(spiIntenvories []inventorymodel.SPIInventory, userID int) error {
 	var err error
 	var DB *gorm.DB = database.DB
 	tx := DB.Begin()
@@ -50,8 +52,8 @@ func UpdateVPItemStock(spiIntenvories []inventorymodel.VPIInventory, userID int)
 	for _, itemInventory := range spiIntenvories {
 
 		// save previous stock to a variable
-		itemBefore := inventorymodel.VPIInventory{}
-		err = tx.Model(&inventorymodel.VPIInventory{}).
+		itemBefore := inventorymodel.SPIInventory{}
+		err = tx.Model(&inventorymodel.SPIInventory{}).
 			First(&itemBefore, itemInventory.ID).Error
 		if err != nil {
 
@@ -60,10 +62,10 @@ func UpdateVPItemStock(spiIntenvories []inventorymodel.VPIInventory, userID int)
 		}
 
 		// create inventoryadjustment
-		err = tx.Model(&inventorymodel.VPIInventoryAdjustment{}).
-			Create(&inventorymodel.VPIInventoryAdjustment{
+		err = tx.Model(&inventorymodel.SPIInventoryAdjustment{}).
+			Create(&inventorymodel.SPIInventoryAdjustment{
 				UserID:         userID,
-				VPIInventoryID: itemInventory.ID,
+				SPIInventoryID: itemInventory.ID,
 				StockBefore:    itemBefore.Stock,
 				StockAfter:     itemInventory.Stock,
 			}).Error
@@ -73,7 +75,7 @@ func UpdateVPItemStock(spiIntenvories []inventorymodel.VPIInventory, userID int)
 			return err
 		}
 		// update ItemInventory Stock
-		err = tx.Model(&inventorymodel.VPIInventory{}).
+		err = tx.Model(&inventorymodel.SPIInventory{}).
 			Where("id = ?", itemInventory.ID).
 			Updates(map[string]interface{}{"stock": itemInventory.Stock}).Error
 		if err != nil {

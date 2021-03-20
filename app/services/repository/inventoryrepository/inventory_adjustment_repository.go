@@ -1,10 +1,6 @@
 package inventoryrepository
 
-import (
-	"distrodakwah_backend/app/services/library/inventorylibrary"
-)
-
-func (r *InventoryRepository) PerformInventoryUpdate(itemInventoryArr []inventorylibrary.ItemInventoryXlsx, userID int) error {
+func (r *InventoryRepository) PerformInventoryUpdate() error {
 	return nil
 	// var err error
 	// tx := r.DB.Begin()

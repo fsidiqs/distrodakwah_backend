@@ -1,7 +1,7 @@
 package digitalocean
 
 import (
-	productClass "distrodakwah_backend/app/services/library/productlibrary"
+	 "distrodakwah_backend/app/services/library/productlibrary"
 )
 
 var (
@@ -12,7 +12,7 @@ var (
 	BUCKET   string = "files-distrodakwah"
 )
 
-func UploadFiles(files []productClass.ProductImage) ([]string, error) {
+func UploadFiles(files []productlibrary.ProductImage) ([]string, error) {
 
 	// sess := session.Must(session.NewSession(&aws.Config{
 	// 	Credentials: credentials.NewStaticCredentials(KEY, SECRET, ""),

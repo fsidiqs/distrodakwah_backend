@@ -2,19 +2,19 @@ package productlibrary
 
 import (
 	"distrodakwah_backend/app/services/handler/producthandler"
-	"distrodakwah_backend/app/services/library/inventorylibrary"
 	"encoding/json"
 	"strings"
 )
 
 type VariantProductItem struct {
-	ID                    uint                            `gorm:"primaryKey;autoIncrement;not null"`
-	VPID                  uint                            `gorm:"column:VP_id;type:BIGINT;UNSIGNED;NOT NULL" json:"variant_product_id"`
-	Weight                int                             `gorm:"type:INT;UNSIGNED;NOT NULL" json:"weight"`
-	Sku                   string                          `gorm:"type:varchar(255);not null" json:"sku"`
-	VariantProductOptions []VariantProductOption          `gorm:"foreignKey:VPItemID;references:ID" json:"variant_product_options"`
-	VPIInventories        []inventorylibrary.VPIInventory `gorm:"foreignKey:VP_item_id" json:"variant_product_item_inventories"`
-	VPItemPrices          []VPItemPrice                   `gorm:"foreignKey:VPItemID;references:ID" json:"variant_product_item_prices"`
+	ID                    uint                   `gorm:"column:id;primaryKey;autoIncrement;not null"`
+	VPID                  uint                   `gorm:"column:VP_id" json:"variant_product_id"`
+	VariantProduct        *VariantProduct        `gorm:"foreignKey:VPID" json:"variant_product,omitempty"`
+	Weight                int                    `gorm:"type:INT;UNSIGNED;NOT NULL" json:"weight"`
+	Sku                   string                 `gorm:"type:varchar(255);not null" json:"sku"`
+	VariantProductOptions []VariantProductOption `gorm:"foreignKey:VPItemID;references:ID" json:"variant_product_options"`
+	VPIInventories        []VPIInventory         `gorm:"foreignKey:VP_item_id" json:"variant_product_item_inventories"`
+	VPItemPrices          []VPItemPrice          `gorm:"foreignKey:VPItemID;references:ID" json:"variant_product_item_prices"`
 }
 
 func (VariantProductItem) TableName() string {
@@ -46,7 +46,7 @@ func NewVariantProductItem(itemReqJson string) ([]VariantProductItem, error) {
 			}
 		}
 		// options
-		VPIInventories, err := inventorylibrary.NewVPIInventory(itemReq.SubdistrictIDs)
+		VPIInventories, err := NewVPIInventory(itemReq.SubdistrictIDs)
 		variantProductItems[i] = VariantProductItem{
 			Weight:                itemReq.Weight,
 			Sku:                   itemReq.Sku,

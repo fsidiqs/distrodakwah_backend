@@ -1,4 +1,4 @@
-package inventorylibrary
+package productlibrary
 
 import "distrodakwah_backend/app/services/model/shippingmodel"
 

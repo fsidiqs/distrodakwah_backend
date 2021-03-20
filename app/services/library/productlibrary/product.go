@@ -237,7 +237,7 @@ func GetAllProducts(metadata pagination.Metadata) (*pagination.Pagination, error
 
 	singleProducts := []*SingleProductResponse{}
 	err = DB.
-		Raw("Select 1 as product_kind_id, single_products.* from single_products where single_products.id IN (?)", spIDs).
+		Raw(productquery.SEL_SP_BY_ID, spIDs).
 		Preload("ProductImages").
 		Preload("SingleProductItem.SPIPrices").
 		// Preload("SingleProductItem.SPIInventories.SPIInventoryDetail").
@@ -246,7 +246,7 @@ func GetAllProducts(metadata pagination.Metadata) (*pagination.Pagination, error
 
 	variantProducts := []*VariantProductResponse{}
 	err = DB.
-		Raw("Select 2 as product_kind_id, variant_products.* from variant_products where variant_products.id IN (?)", vpIDs).
+		Raw(productquery.SEL_VP_BY_ID, vpIDs).
 		Preload("ProductImages").
 		Preload("VariantProductItems.VPItemPrices").
 		Preload("VariantProductItems.VPIInventories.VPIInventoryDetail").

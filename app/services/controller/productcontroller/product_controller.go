@@ -382,3 +382,47 @@ func (pc *ProductController) GetProductTypes(c echo.Context) error {
 	}
 	return c.JSON(res.Status, res)
 }
+
+func (pc *ProductController) GetProductByItemInventoryID(c echo.Context) error {
+	IInventoryIDReq := c.QueryParam("item_inventory_id_arr")
+	var biArray [][]int
+	if IInventoryIDReq != "" {
+		json.Unmarshal([]byte(IInventoryIDReq), &biArray)
+		// err = json.NewDecoder(strings.NewReader(itemIDArrReq)).Decode(&biArray)
+	}
+
+	data, err := pc.ProductRepository.FetchByItemInventoryID(biArray)
+	if err != nil {
+		fmt.Println("error find product")
+		return c.JSON(http.StatusBadRequest, "product not found")
+	}
+
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    data,
+	}
+	return c.JSON(res.Status, res)
+}
+
+func (pc *ProductController) GetProductByItemID(c echo.Context) error {
+	ItemIDReq := c.QueryParam("item_id_arr")
+	var biArray [][]int
+	if ItemIDReq != "" {
+		json.Unmarshal([]byte(ItemIDReq), &biArray)
+		// err = json.NewDecoder(strings.NewReader(itemIDArrReq)).Decode(&biArray)
+	}
+
+	data, err := pc.ProductRepository.FetchByItemID(biArray)
+	if err != nil {
+		fmt.Println("error find product")
+		return c.JSON(http.StatusBadRequest, "product not found")
+	}
+
+	res := &httphelper.Response{
+		Status:  http.StatusOK,
+		Message: httphelper.StatusOKMessage,
+		Data:    data,
+	}
+	return c.JSON(res.Status, res)
+}

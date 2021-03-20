@@ -108,7 +108,7 @@ const (
 	SEL_PRODUCT_STOCKS_BY_ID = `
 	SELECT
 	*
-FROM
+	FROM
 	(
 	SELECT
 		1 AS kind,
@@ -127,7 +127,7 @@ FROM
 	WHERE
 		sp.id IN (?)
 		AND sp.deleted_at IS NULL
-UNION
+	UNION
 	SELECT
 		2 AS kind,
 		vp.name,
@@ -145,7 +145,28 @@ UNION
 	WHERE
 		vp.id IN (?)
 		AND vp.deleted_at IS NULL ) tablea
-ORDER BY
+	ORDER BY
 	created_at;
 	`
+
+	SEL_SP_BY_ID = `
+	SELECT 1 as product_kind_id, single_products.* 
+	FROM
+		single_products WHERE
+	single_products.id IN (?)
+	`
+
+	SEL_VP_BY_ID = `Select 2 as product_kind_id, variant_products.* from variant_products where variant_products.id IN (?)`
+
+	SEL_SP_BY_ITEM_INVENTORY_ID = `SELECT sii.* FROM SP_item_inventories sii 
+	where sii.id in (?)`
+
+	SEL_VP_BY_ITEM_INVENTORY_ID = `SELECT vii.* FROM VP_item_inventories vii 
+	where vii.id in (?)`
+
+	SEL_SP_BY_ITEM_ID = `SELECT si.* FROM SP_items si 
+	where si.id in (?)`
+
+	SEL_VP_BY_ITEM_ID = `SELECT vi.* FROM VP_items vi 
+	where vi.id in (?)`
 )

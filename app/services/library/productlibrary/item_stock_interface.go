@@ -1,7 +1,6 @@
 package productlibrary
 
 import (
-	"distrodakwah_backend/app/services/library/inventorylibrary"
 	"distrodakwah_backend/app/services/model/inventorymodel"
 	"distrodakwah_backend/app/services/model/productmodel"
 	"fmt"
@@ -35,7 +34,7 @@ func SaveProductStocks(stocks []ProductStock, userID int) error {
 	}
 
 	if len(spiIntenvories) > 0 {
-		err = inventorylibrary.UpdateSPItemStock(spiIntenvories, userID)
+		err = UpdateSPItemStock(spiIntenvories, userID)
 		if err != nil {
 			fmt.Println("error updating product")
 			return err
@@ -43,7 +42,7 @@ func SaveProductStocks(stocks []ProductStock, userID int) error {
 	}
 
 	if len(vpiInventories) > 0 {
-		err = inventorylibrary.UpdateVPItemStock(vpiInventories, userID)
+		err = UpdateVPItemStock(vpiInventories, userID)
 		if err != nil {
 			fmt.Println("error updating product")
 			return err
